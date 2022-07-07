@@ -5,7 +5,7 @@
         <h2>Welcome</h2>
       </div>
       <div class="formdata">
-        <el-form ref="form" :model="form" :rules="rules">
+        <el-form ref="formRef" :model="form" :rules="rules">
           <el-form-item prop="username">
             <el-input
               v-model="form.username"
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="butt">
-        <el-button type="primary" @click.native.prevent="login('form')"
+        <el-button type="primary" @click="login"
           >登录</el-button
         >
         <el-button class="shou" @click="register">注册</el-button>
@@ -52,7 +52,7 @@
         :model="ruleFormReg"
         status-icon
         :rules="rulesReg"
-        ref="ruleFormReg"
+        ref="ruleFormRef"
         label-width="100px"
         class="demo-ruleFormReg"
       >
@@ -89,11 +89,12 @@ export default {
     return {
       dialogVisible: false,
       form: {
-        password: "",
         username: "",
+        password: "",
       },
       ruleFormReg:{
-
+        name: "",
+        pass: "",
       },
       checked: false,
       rules: {
@@ -119,14 +120,18 @@ export default {
     };
   },
   mounted() {
-    if (localStorage.getItem("news")) {
+    /*if (localStorage.getItem("news")) {
       this.form = JSON.parse(localStorage.getItem("news"));
       this.checked = true;
-    }
+    }*/
   },
   methods: {
     login(form) {
-      
+      this.$refs.formRef.validate(valid=>{
+        if(!valid) return;
+        const result = this.$http.post("login",this.form);
+        console.log(result);
+      })
     },
     remenber(data) {
       this.checked = data;
@@ -148,6 +153,9 @@ export default {
     },
     registerCommit(){
 
+      this.dialogVisible = false;
+    },
+    handleClose(){
       this.dialogVisible = false;
     }
   },
