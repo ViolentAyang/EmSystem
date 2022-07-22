@@ -1,8 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Data from '../views/Data.vue'
+import User from '../views/User.vue'
+import About from '../views/About.vue'
+import yearMajorClass from '../views/DataManage/yearMajorClass.vue'
 
 Vue.use(VueRouter)
+
 
 const routes = [
   {
@@ -17,6 +22,26 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/data',
+    name: 'Data',
+    component: Data
+  },
+  {
+    path: '/user',
+    name: 'User',
+    component: User
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About
+  },
+  {
+    path: '/yearMajorClass',
+    name: 'yearMajorClass',
+    component: yearMajorClass
   },
   //{
     //path: '/about',

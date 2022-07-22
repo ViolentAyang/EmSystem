@@ -43,6 +43,7 @@
       <!--注册-->
     </div>
     <el-dialog
+      :modal=false
       title="注册"
       :visible.sync="dialogVisible"
       width="30%"
@@ -96,6 +97,10 @@ export default {
         name: "",
         pass: "",
       },
+      registerdata:{
+        username: "",
+        password: "",
+      },
       checked: false,
       rules: {
         username: [
@@ -127,10 +132,14 @@ export default {
   },
   methods: {
     login(form) {
-      this.$refs.formRef.validate(valid=>{
+      this.$refs.formRef.validate(async valid=>{
         if(!valid) return;
-        const result = this.$http.post("login",this.form);
-        console.log(result);
+        const {data:res} = await this.$http.post("login",this.form);
+        if(res.meta.status!='200') return this.$message.error('登录失败！');
+        this.$message.success('登录成功！');
+        console.log(res);
+        window.sessionStorage.setItem('token',res.data.token);
+        this.$router.push('/home');
       })
     },
     remenber(data) {
@@ -152,7 +161,14 @@ export default {
       this.dialogVisible = true;
     },
     registerCommit(){
-
+      this.registerdata.username = this.ruleFormReg.name
+      this.registerdata.password = this.ruleFormReg.pass
+      this.$refs.ruleFormRef.validate(async valid=>{
+        if(!valid) return;
+        const {data:res} = await this.$http.post("register",this.registerdata);
+        if(res.meta.status!='200') return this.$message.error('注册失败！');
+        this.$message.success('注册成功！');
+      })
       this.dialogVisible = false;
     },
     handleClose(){
