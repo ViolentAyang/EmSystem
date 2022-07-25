@@ -22,16 +22,36 @@
     </div>
     <el-alert title="设置班级 年级 专业" type="success" :closable="false">
     </el-alert>
-    <el-button style="margin-right:30px; margin-top: 10px;margin-bottom: 10px;float:right;" @click="setClass" type="success">设置班级</el-button>
-    <el-button style="margin-right: 10px; margin-top: 10px;margin-bottom: 10px;float:right;" @click="setMajor" type="success">设置专业</el-button>
-    
-   <el-button
+    <el-button
+      style="
+        margin-right: 30px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        float: right;
+      "
+      @click="setClass"
+      type="success"
+      >设置班级</el-button
+    >
+    <el-button
+      style="
+        margin-right: 10px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        float: right;
+      "
+      @click="setMajor"
+      type="success"
+      >设置专业</el-button
+    >
+
+    <!--<el-button
       @click="setYear"
       style="margin-top: 10px;margin-bottom: 10px;float:right;"
       type="success"
       >设置年级</el-button
-    >
-    
+    >-->
+
     <!--设置年级对话框-->
     <el-dialog
       title="设置年级"
@@ -143,6 +163,12 @@
         label-width="100px"
         class="demo-dynamic"
       >
+        <el-alert
+          style="margin-bottom: 5px"
+          title="选择年级后进行搜索可以获得该年级对应所有的专业"
+          type="warning"
+        >
+        </el-alert>
         <el-form-item
           label="请选择年级"
           :rules="{
@@ -160,6 +186,12 @@
             >
             </el-option>
           </el-select>
+
+          <el-button
+            style="margin-left: 10px"
+            icon="el-icon-search"
+            circle
+          ></el-button>
         </el-form-item>
         <el-form-item
           label="请选择专业"
@@ -207,19 +239,28 @@
     </el-dialog>
 
     <!--显示用户下所有的班级年级专业-->
-    <el-table :cell-style="{ textAlign: 'center'}" :data="tableData" border style="width: 100%">
-      <el-table-column header-align="center" prop="yearTable" label="年级" > </el-table-column>
-      <el-table-column header-align="center" prop="majorTable" label="专业" > </el-table-column>
-      <el-table-column header-align="center" prop="classTable" label="班级"> </el-table-column>
-       <el-table-column header-align="center" label="操作">
-      <template slot-scope="scope">
-        
-        <el-button
-          size="mini"
-          type="danger"
-          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-      </template>
-    </el-table-column>
+    <el-table
+      :cell-style="{ textAlign: 'center' }"
+      :data="tableData"
+      border
+      style="width: 100%"
+    >
+      <el-table-column header-align="center" prop="yearTable" label="年级">
+      </el-table-column>
+      <el-table-column header-align="center" prop="majorTable" label="专业">
+      </el-table-column>
+      <el-table-column header-align="center" prop="classTable" label="班级">
+      </el-table-column>
+      <el-table-column header-align="center" label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(scope.$index, scope.row)"
+            >删除</el-button
+          >
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -241,13 +282,13 @@ export default {
           },
         ],
       },
-      tableData:[
-        { yearTable: "2020",majorTable: "软件工程",classTable: "一班" },
-        { yearTable: "2020",majorTable: "软件工程",classTable: "二班" },
-        { yearTable: "2020",majorTable: "金融工程",classTable: "一班" },
-        { yearTable: "2020",majorTable: "金融工程",classTable: "二班" },
-        { yearTable: "2020",majorTable: "土木工程",classTable: "一班" },
-        { yearTable: "2020",majorTable: "土木工程",classTable: "二班" },
+      tableData: [
+        { yearTable: "2020", majorTable: "软件工程", classTable: "一班" },
+        { yearTable: "2020", majorTable: "软件工程", classTable: "二班" },
+        { yearTable: "2020", majorTable: "金融工程", classTable: "一班" },
+        { yearTable: "2020", majorTable: "金融工程", classTable: "二班" },
+        { yearTable: "2020", majorTable: "土木工程", classTable: "一班" },
+        { yearTable: "2020", majorTable: "土木工程", classTable: "二班" },
       ],
       classOptions: [
         { id: "600", name: "1班" },
@@ -329,15 +370,15 @@ export default {
       });
     },
     handleDelete(index, row) {
-        console.log(index, row);
+      console.log(index, row);
     },
     handleClose(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      }
+      this.$confirm("确认关闭？")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
   },
 };
 </script>
@@ -350,7 +391,8 @@ export default {
   text-align: center;
   line-height: 40px;
 }
-.el-table td, .el-table th {
-            text-align: center;
-        } 
+.el-table td,
+.el-table th {
+  text-align: center;
+}
 </style>

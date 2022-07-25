@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Data from '../views/Data.vue'
 import User from '../views/User.vue'
 import About from '../views/About.vue'
+import Class from '../views/Class.vue'
 import yearMajorClass from '../views/DataManage/yearMajorClass.vue'
 
 Vue.use(VueRouter)
@@ -42,6 +43,11 @@ const routes = [
     path: '/yearMajorClass',
     name: 'yearMajorClass',
     component: yearMajorClass
+  },
+  {
+    path: '/Class',
+    name: 'Class',
+    component: Class
   },
   //{
     //path: '/about',
