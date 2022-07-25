@@ -5,7 +5,11 @@ import Data from '../views/Data.vue'
 import User from '../views/User.vue'
 import About from '../views/About.vue'
 import Class from '../views/Class.vue'
+import graduateDemands from '../views/DataManage/graduateDemands.vue'
 import yearMajorClass from '../views/DataManage/yearMajorClass.vue'
+import point from '../views/DataManage/point.vue'
+import trainingPlan from '../views/DataManage/trainingPlan.vue'
+import assign from '../views/DataManage/assign.vue'
 
 Vue.use(VueRouter)
 
@@ -48,6 +52,26 @@ const routes = [
     path: '/Class',
     name: 'Class',
     component: Class
+  },
+  {
+    path: '/graduateDemands',
+    name: 'graduateDemands',
+    component: graduateDemands
+  },
+  {
+    path: '/point',
+    name: 'point',
+    component: point
+  },
+  {
+    path: '/trainingPlan',
+    name: 'trainingPlan',
+    component: trainingPlan
+  },
+  {
+    path: '/assign',
+    name: 'assign',
+    component: assign
   },
   //{
     //path: '/about',

@@ -67,7 +67,7 @@ export default {
       this.$router.push("/home");
     },
     user() {
-      this.$router.push("/class");
+      this.$router.push("/user");
     },
     about() {
       this.$router.push("/about");

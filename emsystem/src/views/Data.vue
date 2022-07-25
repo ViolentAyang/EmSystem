@@ -42,15 +42,15 @@ export default {
               },
               count: '基础信息设置',
               title: '设置学校共有多少年级,每个年级有专业,以及专业对应的班级',
-              icon: 'el-icon-warning',
+              icon: 'el-icon-menu',
               color: '	#00CD66'
             }, {
               click: function (item) {
-                alert(JSON.stringify(item));
+                window.location.replace("/#/graduateDemands");
               },
               count: '毕业要求设置',
               title: '对专业的毕业要求进行新增修改删除等操作',
-              icon: 'el-icon-view',
+              icon: 'el-icon-document',
               color: '	#7B68EE'
             }, {
               click: function (item) {
@@ -62,28 +62,28 @@ export default {
               color: '#f39c12'
             },
              {
-              click: function (item) {
-                alert(JSON.stringify(item));
+               click: function (item) {
+                window.location.replace("/#/point");
               },
               count: '指标点设置',
               title: '对毕业要求对应的指标点内容进行新增修改删除等操作',
-              icon: 'el-icon-warning',
+              icon: 'el-icon-s-management',
               color: '	#FF6A6A'
             }, {
               click: function (item) {
-                alert(JSON.stringify(item));
+                window.location.replace("/#/trainingPlan");
               },
               count: '培养计划设置',
               title: '对培养计划中的课程信息进行新增修改删除等操作',
-              icon: 'el-icon-view',
+              icon: 'el-icon-warning',
               color: '#00a65a'
             }, {
               click: function (item) {
-                alert(JSON.stringify(item));
+                window.location.replace("/#/assign");
               },
               count: '分配指标点',
               title: '给指标点分配课程和支撑等级',
-              icon: 'el-icon-setting',
+              icon: 'el-icon-location-outline',
               color: '#363636'
             }
           ]
