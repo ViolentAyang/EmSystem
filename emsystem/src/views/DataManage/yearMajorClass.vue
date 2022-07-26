@@ -45,52 +45,6 @@
       >设置专业</el-button
     >
 
-    <!--<el-button
-      @click="setYear"
-      style="margin-top: 10px;margin-bottom: 10px;float:right;"
-      type="success"
-      >设置年级</el-button
-    >-->
-
-    <!--设置年级对话框-->
-    <el-dialog
-      title="设置年级"
-      :visible.sync="yearDialogVisible"
-      width="40%"
-      :before-close="handleClose"
-    >
-      <el-form
-        :model="dynamicValidateForm"
-        ref="dynamicValidateForm"
-        label-width="100px"
-        class="demo-dynamic"
-      >
-        <el-form-item
-          v-for="(domain, index) in dynamicValidateForm.domains"
-          :label="'序号' + index"
-          :key="domain.key"
-          :prop="'domains.' + index + '.value'"
-          :rules="{
-            required: true,
-            message: '年级不能为空',
-            trigger: 'blur',
-          }"
-        >
-          <el-input v-model="domain.value"></el-input
-          ><el-button @click.prevent="removeDomain(domain)">删除</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm('dynamicValidateForm')"
-            >提交</el-button
-          >
-          <el-button @click="addDomain">新增年级</el-button>
-          <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
-          <el-button type="danger" @click="yearDialogVisible = false"
-            >取 消</el-button
-          >
-        </el-form-item>
-      </el-form>
-    </el-dialog>
     <!--设置专业对话框-->
     <el-dialog
       title="设置专业"
@@ -100,8 +54,8 @@
     >
       <el-form
         :inline="true"
-        :model="dynamicValidateForm"
-        ref="dynamicValidateForm"
+        :model="MajordynamicValidateForm"
+        ref="MajordynamicValidateForm"
         label-width="100px"
         class="demo-dynamic"
       >
@@ -124,7 +78,7 @@
           </el-select>
         </el-form-item>
         <el-form-item
-          v-for="(domain, index) in dynamicValidateForm.domains"
+          v-for="(domain, index) in MajordynamicValidateForm.domains"
           :label="'专业' + index"
           :key="domain.key"
           :prop="'domains.' + index + '.value'"
@@ -135,21 +89,28 @@
           }"
         >
           <el-input size="small" v-model="domain.value"></el-input
-          ><el-button @click.prevent="removeDomain(domain)">删除</el-button>
+          ><el-button @click.prevent="removeDomainMajor(domain)"
+            >删除</el-button
+          >
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('dynamicValidateForm')"
+          <el-button
+            type="primary"
+            @click="submitFormMajor('MajordynamicValidateForm')"
             >提交</el-button
           >
-          <el-button @click="addDomain">新增专业</el-button>
-          <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
-          <el-button type="danger" @click="yearDialogVisible = false"
+          <el-button @click="addDomainMajor">新增专业</el-button>
+          <el-button @click="resetFormMajor('MajordynamicValidateForm')"
+            >重置</el-button
+          >
+          <el-button type="danger" @click="majorDialogVisible = false"
             >取 消</el-button
           >
         </el-form-item>
       </el-form>
     </el-dialog>
     <!--设置班级对话框-->
+
     <el-dialog
       title="设置班级"
       :visible.sync="classDialogVisible"
@@ -158,8 +119,8 @@
     >
       <el-form
         :inline="true"
-        :model="dynamicValidateForm"
-        ref="dynamicValidateForm"
+        :model="ClassdynamicValidateForm"
+        ref="ClassdynamicValidateForm"
         label-width="100px"
         class="demo-dynamic"
       >
@@ -188,6 +149,7 @@
           </el-select>
 
           <el-button
+            @click="getCorrespondingMajor"
             style="margin-left: 10px"
             icon="el-icon-search"
             circle
@@ -204,34 +166,40 @@
           <el-select v-model="majorValue" placeholder="请选择">
             <el-option
               v-for="item in majorOptions"
-              :key="item.value"
+              :key="item.id"
               :label="item.label"
-              :value="item.value"
+              :value="item.id"
             >
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item
-          v-for="(domain, index) in dynamicValidateForm.domains"
-          :label="'专业' + index"
+          v-for="(domain, index) in ClassdynamicValidateForm.domains"
+          :label="'班级' + index"
           :key="domain.key"
           :prop="'domains.' + index + '.value'"
           :rules="{
             required: true,
-            message: '专业不能为空',
+            message: '班级不能为空',
             trigger: 'blur',
           }"
         >
           <el-input size="small" v-model="domain.value"></el-input
-          ><el-button @click.prevent="removeDomain(domain)">删除</el-button>
+          ><el-button @click.prevent="removeDomainClass(domain)"
+            >删除</el-button
+          >
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('dynamicValidateForm')"
+          <el-button
+            type="primary"
+            @click="submitFormClass('ClassdynamicValidateForm')"
             >提交</el-button
           >
-          <el-button @click="addDomain">新增专业</el-button>
-          <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
-          <el-button type="danger" @click="yearDialogVisible = false"
+          <el-button @click="addDomainClass">新增班级</el-button>
+          <el-button @click="resetFormClass('ClassdynamicValidateForm')"
+            >重置</el-button
+          >
+          <el-button type="danger" @click="classDialogVisible = false"
             >取 消</el-button
           >
         </el-form-item>
@@ -241,22 +209,22 @@
     <!--显示用户下所有的班级年级专业-->
     <el-table
       :cell-style="{ textAlign: 'center' }"
-      :data="tableData"
+      :data="allTableData"
       border
       style="width: 100%"
     >
-      <el-table-column header-align="center" prop="yearTable" label="年级">
+      <el-table-column header-align="center" prop="gradeId" label="年级">
       </el-table-column>
-      <el-table-column header-align="center" prop="majorTable" label="专业">
+      <el-table-column header-align="center" prop="majorName" label="专业">
       </el-table-column>
-      <el-table-column header-align="center" prop="classTable" label="班级">
+      <el-table-column header-align="center" prop="className" label="班级">
       </el-table-column>
       <el-table-column header-align="center" label="操作">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
+            @click="handleDelete(scope.row)"
             >删除</el-button
           >
         </template>
@@ -274,51 +242,76 @@ export default {
       yearDialogVisible: false, //设置年级对话框
       majorDialogVisible: false, //设置专业对话框
       classDialogVisible: false, //设置班级对话框
-      dynamicValidateForm: {
-        //动态表单增减
+      gradeSearch: {
+        //用于查询年级对应的专业
+        gradeId: "",
+      },
+      allTableData: [],
+      MajorSubmit: {
+        //设置专业提交的数据
+        gradeId: "",
+        majorArray: [],
+      },
+      ClassSubmit: {
+        //设置班级提交的数据
+        gradeId: "",
+        majorId: "",
+        classArray: [],
+      },
+      //过滤 如果全部为空 则返回所有数据
+      InitSearch: {
+        gradeTable: "",
+        majorSearch: "",
+        classSearch: "",
+      },
+      MajordynamicValidateForm: {
+        //专业动态表单增减
         domains: [
           {
             value: "",
           },
         ],
       },
-      tableData: [
-        { yearTable: "2020", majorTable: "软件工程", classTable: "一班" },
-        { yearTable: "2020", majorTable: "软件工程", classTable: "二班" },
-        { yearTable: "2020", majorTable: "金融工程", classTable: "一班" },
-        { yearTable: "2020", majorTable: "金融工程", classTable: "二班" },
-        { yearTable: "2020", majorTable: "土木工程", classTable: "一班" },
-        { yearTable: "2020", majorTable: "土木工程", classTable: "二班" },
-      ],
-      classOptions: [
-        { id: "600", name: "1班" },
-        { id: "601", name: "2班" },
-        { id: "602", name: "3班" },
-        { id: "603", name: "4班" },
-        { id: "604", name: "5班" },
-        { id: "605", name: "6班" },
-      ],
+      ClassdynamicValidateForm: {
+        //班级动态表单增减
+        domains: [
+          {
+            value: "",
+          },
+        ],
+      },
+      singleDeleteArray:{
+          classArray: []
+      },
       yearOptions: [
-        { id: "2019", name: "2019级学生" },
-        { id: "2020", name: "2020级学生" },
-        { id: "2021", name: "2021级学生" },
-        { id: "2022", name: "2022级学生" },
-        { id: "2023", name: "2023级学生" },
+        { id: "2018", name: "2018级" },
+        { id: "2019", name: "2019级" },
+        { id: "2020", name: "2020级" },
+        { id: "2021", name: "2021级" },
+        { id: "2022", name: "2022级" },
+        { id: "2023", name: "2023级" },
+        { id: "2024", name: "2024级" },
       ],
-      majorOptions: [
-        { value: "01", label: "会计学" },
-        { value: "02", label: "财务管理" },
-        { value: "03", label: "审计学" },
-        { value: "04", label: "金融学" },
-        { value: "05", label: "金融工程" },
-        { value: "06", label: "市场营销" },
-        { value: "07", label: "物流管理" },
-        { value: "08", label: "国际经济与贸易" },
-        { value: "09", label: "电子商务" },
-      ],
+      majorOptions: [],
     };
   },
+  created() {
+    // 页面初始化函数
+    this.getList();
+  },
   methods: {
+    async getList() {
+      const { data: res } = await this.$http.post(
+        "getAllMajorClass",
+        this.InitSearch
+      );
+      if (res.meta.status != "200") return this.$message.error("获取失败！");
+      this.$message.success("获取成功！");
+      this.allTableData = res.data.tableData;
+      console.log(res.data.tableData);
+      console.log("测试初始化数据");
+      console.log(res);
+    },
     setYear() {
       this.yearDialogVisible = !this.yearDialogVisible;
     },
@@ -344,33 +337,124 @@ export default {
       this.$router.push("/class");
     },
 
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    //设置专业的函数
+    submitFormMajor(formName) {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          alert("submit!");
+          //this.MajorSubmit.gradeId = this.MajordynamicValidateForm[0]
+          console.log(this.MajordynamicValidateForm);
+          this.MajorSubmit.gradeId = this.yearValue;
+          for (
+            let i = 0;
+            i < this.MajordynamicValidateForm.domains.length;
+            i++
+          ) {
+            console.log(this.MajordynamicValidateForm.domains[i].value);
+            this.MajorSubmit.majorArray.push(
+              this.MajordynamicValidateForm.domains[i].value
+            );
+          }
+          console.log("测试提交的数据");
+          const { data: res } = await this.$http.post(
+            "addMajor",
+            this.MajorSubmit
+          );
+          console.log(this.MajorSubmit);
+          //console.log(this.MajordynamicValidateForm.domains[0].value);
+          this.resetFormMajor(formName);
+          if (res.meta.status != "200")
+            return this.$message.error("提交失败！");
+          this.$message.success("提交成功！");
+          this.getList();
+          this.majorDialogVisible = false;
+          console.log(res);
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
-    resetForm(formName) {
+    resetFormMajor(formName) {
       this.$refs[formName].resetFields();
+      this.yearValue = "";
     },
-    removeDomain(item) {
-      var index = this.dynamicValidateForm.domains.indexOf(item);
+    removeDomainMajor(item) {
+      var index = this.MajordynamicValidateForm.domains.indexOf(item);
       if (index !== -1) {
-        this.dynamicValidateForm.domains.splice(index, 1);
+        this.MajordynamicValidateForm.domains.splice(index, 1);
       }
     },
-    addDomain() {
-      this.dynamicValidateForm.domains.push({
+    addDomainMajor() {
+      this.MajordynamicValidateForm.domains.push({
         value: "",
         key: Date.now(),
       });
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    async handleDelete(row) {
+      console.log(row);
+      this.singleDeleteArray.classArray.push(row.classId)
+      console.log("测试单选删除数组")
+      console.log(this.singleDeleteArray)
+      const { data: res } = await this.$http.delete("deleteClass", this.singleDeleteArray);
+      console.log("测试单选删除接口");
+      console.log(res);
+      if (res.meta.status != "200") return this.$message.error("删除失败！");
+      this.$message.success("删除成功！");
+    },
+    //设置班级的函数
+    removeDomainClass(item) {
+      var index = this.ClassdynamicValidateForm.domains.indexOf(item);
+      if (index !== -1) {
+        this.ClassdynamicValidateForm.domains.splice(index, 1);
+      }
+    },
+    submitFormClass(formName) {
+      this.$refs[formName].validate(async (valid) => {
+        if (valid) {
+          //this.ClassSubmit.gradeId = this.ClassdynamicValidateForm[0]
+          console.log(this.ClassdynamicValidateForm);
+          this.ClassSubmit.gradeId = this.yearValue;
+          this.ClassSubmit.majorId = this.majorValue;
+          for (
+            let i = 0;
+            i < this.ClassdynamicValidateForm.domains.length;
+            i++
+          ) {
+            console.log(this.ClassdynamicValidateForm.domains[i].value);
+            this.ClassSubmit.classArray.push(
+              this.ClassdynamicValidateForm.domains[i].value
+            );
+          }
+          console.log("测试提交的数据");
+          console.log(this.ClassSubmit);
+          this.gradeSearch.gradeId = this.yearValue;
+          const { data: res } = await this.$http.post(
+            "addClass",
+            this.ClassSubmit
+          );
+          if (res.meta.status != "200") return this.$message.error("添加失败！");
+          this.getList();
+          this.$message.success("添加成功！");
+          this.classDialogVisible = false;
+          //console.log(this.ClassdynamicValidateForm.domains[0].value);
+          this.resetFormClass(formName);
+          //alert("提交成功!");
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    resetFormClass(formName) {
+      this.$refs[formName].resetFields();
+      this.yearValue = "";
+      this.majorValue = "";
+    },
+    addDomainClass() {
+      this.ClassdynamicValidateForm.domains.push({
+        value: "",
+        key: Date.now(),
+      });
     },
     handleClose(done) {
       this.$confirm("确认关闭？")
@@ -378,6 +462,16 @@ export default {
           done();
         })
         .catch((_) => {});
+    },
+    //获取年级对应的专业
+    async getCorrespondingMajor() {
+      this.gradeSearch.gradeId = this.yearValue;
+      const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
+      console.log("测试查询专业");
+      console.log(res.data.majorData);
+      if (res.meta.status != "200") return this.$message.error("查询失败！");
+      this.majorOptions = res.data.majorData;
+      this.$message.success("查询成功！");
     },
   },
 };
