@@ -22,6 +22,44 @@
     </div>
     <el-alert title="设置班级 年级 专业" type="success" :closable="false">
     </el-alert>
+
+    <div style="float: left; display: flex">
+      <el-select
+        style="
+          width: 140px;
+          margin-right: 10px;
+          margin-top: 10px;
+          margin-left: 10px;
+        "
+        v-model="yearFilter"
+        placeholder="选择年级查询"
+      >
+        <el-option
+          v-for="item in yearOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        >
+        </el-option>
+      </el-select>
+      <el-input
+        style="width: 180px; margin-right: 10px; margin-top: 10px"
+        v-model="majorFilter"
+        placeholder="请输入专业名"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-top: 10px; margin-right: 10px"
+        v-model="classFilter"
+        placeholder="请输入班级名"
+      ></el-input>
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="tableFilter"
+        type="primary"
+        icon="el-icon-search"
+        >搜索·</el-button
+      >
+    </div>
     <el-button
       style="
         margin-right: 30px;
@@ -50,7 +88,7 @@
       title="设置专业"
       :visible.sync="majorDialogVisible"
       width="40%"
-      :before-close="handleClose"
+      :before-close="handleCloseMajor"
     >
       <el-form
         :inline="true"
@@ -103,9 +141,6 @@
           <el-button @click="resetFormMajor('MajordynamicValidateForm')"
             >重置</el-button
           >
-          <el-button type="danger" @click="majorDialogVisible = false"
-            >取 消</el-button
-          >
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -115,7 +150,7 @@
       title="设置班级"
       :visible.sync="classDialogVisible"
       width="40%"
-      :before-close="handleClose"
+      :before-close="handleCloseClass"
     >
       <el-form
         :inline="true"
@@ -199,15 +234,13 @@
           <el-button @click="resetFormClass('ClassdynamicValidateForm')"
             >重置</el-button
           >
-          <el-button type="danger" @click="classDialogVisible = false"
-            >取 消</el-button
-          >
         </el-form-item>
       </el-form>
     </el-dialog>
 
     <!--显示用户下所有的班级年级专业-->
     <el-table
+      :span-method="objectSpanMethod"
       :cell-style="{ textAlign: 'center' }"
       :data="allTableData"
       border
@@ -221,10 +254,7 @@
       </el-table-column>
       <el-table-column header-align="center" label="操作">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row)"
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
             >删除</el-button
           >
         </template>
@@ -237,6 +267,9 @@
 export default {
   data() {
     return {
+      yearFilter: "", //大表格进行筛选年级
+      majorFilter: "", //大表格进行筛选专业
+      classFilter: "", //大表格进行筛选班级
       yearValue: "", //设置专业时 选择年级下拉框的绑定值
       majorValue: "", //设置班级时 选择专业下拉框的绑定值
       yearDialogVisible: false, //设置年级对话框
@@ -260,7 +293,7 @@ export default {
       },
       //过滤 如果全部为空 则返回所有数据
       InitSearch: {
-        gradeTable: "",
+        gradeSearch: "",
         majorSearch: "",
         classSearch: "",
       },
@@ -280,8 +313,8 @@ export default {
           },
         ],
       },
-      singleDeleteArray:{
-          classArray: []
+      singleDeleteArray: {
+        classArray: [],
       },
       yearOptions: [
         { id: "2018", name: "2018级" },
@@ -392,10 +425,13 @@ export default {
     },
     async handleDelete(row) {
       console.log(row);
-      this.singleDeleteArray.classArray.push(row.classId)
-      console.log("测试单选删除数组")
-      console.log(this.singleDeleteArray)
-      const { data: res } = await this.$http.delete("deleteClass", this.singleDeleteArray);
+      this.singleDeleteArray.classArray.push(row.classId);
+      console.log("测试单选删除数组");
+      console.log(this.singleDeleteArray);
+      const { data: res } = await this.$http.post(
+        "deleteClass",
+        this.singleDeleteArray
+      );
       console.log("测试单选删除接口");
       console.log(res);
       if (res.meta.status != "200") return this.$message.error("删除失败！");
@@ -432,7 +468,8 @@ export default {
             "addClass",
             this.ClassSubmit
           );
-          if (res.meta.status != "200") return this.$message.error("添加失败！");
+          if (res.meta.status != "200")
+            return this.$message.error("添加失败！");
           this.getList();
           this.$message.success("添加成功！");
           this.classDialogVisible = false;
@@ -456,12 +493,16 @@ export default {
         key: Date.now(),
       });
     },
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    //关闭班级对话框
+    handleCloseClass() {
+      this.classDialogVisible = false;
+      this.resetFormClass("ClassdynamicValidateForm");
+    },
+    //关闭专业对话框
+    handleCloseMajor() {
+      this.majorDialogVisible = false;
+
+      this.resetFormMajor("MajordynamicValidateForm");
     },
     //获取年级对应的专业
     async getCorrespondingMajor() {
@@ -473,6 +514,53 @@ export default {
       this.majorOptions = res.data.majorData;
       this.$message.success("查询成功！");
     },
+    //筛选表格数据
+    async tableFilter() {
+      this.InitSearch.gradeSearch = this.yearFilter;
+      this.InitSearch.majorSearch = this.majorFilter;
+      this.InitSearch.classSearch = this.classFilter;
+      console.log("测试大搜索");
+      console.log(this.InitSearch);
+      const { data: res } = await this.$http.post(
+        "getAllMajorClass",
+        this.InitSearch
+      );
+      if (res.meta.status != "200") return this.$message.error("搜索失败！");
+      this.$message.success("搜索成功！");
+      this.allTableData = res.data.tableData;
+      this.clearData();
+    },
+    //清空搜索数据
+    clearData() {
+      this.yearFilter = "";
+      this.majorFilter = "";
+      this.classFilter = "";
+    },
+    //动态合并表格
+    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+        if (rowIndex % 2 === 0) {
+          if (columnIndex === 0) {
+            return [1, 2];
+          } else if (columnIndex === 1) {
+            return [0, 0];
+          }
+        }
+      },
+      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+        if (columnIndex === 0) {
+          if (rowIndex % 2 === 0) {
+            return {
+              rowspan: 2,
+              colspan: 1
+            };
+          } else {
+            return {
+              rowspan: 0,
+              colspan: 0
+            };
+          }
+        }
+      }
   },
 };
 </script>
