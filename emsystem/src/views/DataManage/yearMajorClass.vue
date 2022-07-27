@@ -6,7 +6,7 @@
         <el-button @click="home" style="margin-left: 720px" type="danger" plain>
           首页
         </el-button>
-        <el-button @click="data" type="primary" plain>数据管理</el-button>
+        <el-button @click="dataClick" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
         >
@@ -198,7 +198,11 @@
             trigger: 'blur',
           }"
         >
-          <el-select v-model="majorValue" placeholder="请选择">
+          <el-select
+            :disabled="showMajor"
+            v-model="majorValue"
+            placeholder="请选择"
+          >
             <el-option
               v-for="item in majorOptions"
               :key="item.id"
@@ -267,6 +271,7 @@
 export default {
   data() {
     return {
+      showMajor: true, //是否允许使用专业下拉框，若未选择年级则禁用
       yearFilter: "", //大表格进行筛选年级
       majorFilter: "", //大表格进行筛选专业
       classFilter: "", //大表格进行筛选班级
@@ -326,6 +331,9 @@ export default {
         { id: "2024", name: "2024级" },
       ],
       majorOptions: [],
+      data: [], //列表数据
+      firstLevelIndexArr: [], // 一个空的数组，用于存放第一列每一行记录的合并数  控制第一列的合并
+      firstLevelIndexPos: 0, // firstLevelIndexArr 的索引
     };
   },
   created() {
@@ -340,7 +348,11 @@ export default {
       );
       if (res.meta.status != "200") return this.$message.error("获取失败！");
       this.$message.success("获取成功！");
+      //新增动态合并
       this.allTableData = res.data.tableData;
+      this.data = this.allTableData;
+      this.getSpanArr(this.data);
+
       console.log(res.data.tableData);
       console.log("测试初始化数据");
       console.log(res);
@@ -354,7 +366,7 @@ export default {
     setClass() {
       this.classDialogVisible = !this.classDialogVisible;
     },
-    data() {
+    dataClick() {
       this.$router.push("/data");
     },
     home() {
@@ -435,6 +447,7 @@ export default {
       console.log("测试单选删除接口");
       console.log(res);
       if (res.meta.status != "200") return this.$message.error("删除失败！");
+      this.getList();
       this.$message.success("删除成功！");
     },
     //设置班级的函数
@@ -464,6 +477,7 @@ export default {
           console.log("测试提交的数据");
           console.log(this.ClassSubmit);
           this.gradeSearch.gradeId = this.yearValue;
+          if (this.majorValue == "") return this.$message.error("请选择专业！");
           const { data: res } = await this.$http.post(
             "addClass",
             this.ClassSubmit
@@ -501,7 +515,6 @@ export default {
     //关闭专业对话框
     handleCloseMajor() {
       this.majorDialogVisible = false;
-
       this.resetFormMajor("MajordynamicValidateForm");
     },
     //获取年级对应的专业
@@ -512,6 +525,7 @@ export default {
       console.log(res.data.majorData);
       if (res.meta.status != "200") return this.$message.error("查询失败！");
       this.majorOptions = res.data.majorData;
+      this.showMajor = false;
       this.$message.success("查询成功！");
     },
     //筛选表格数据
@@ -537,30 +551,38 @@ export default {
       this.classFilter = "";
     },
     //动态合并表格
-    arraySpanMethod({ row, column, rowIndex, columnIndex }) {
-        if (rowIndex % 2 === 0) {
-          if (columnIndex === 0) {
-            return [1, 2];
-          } else if (columnIndex === 1) {
-            return [0, 0];
-          }
-        }
-      },
-      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-        if (columnIndex === 0) {
-          if (rowIndex % 2 === 0) {
-            return {
-              rowspan: 2,
-              colspan: 1
-            };
+    getSpanArr(data) {
+      // firstLevelIndexArr/secondLevelIndexArr来存放要合并的格数，同时还要设定一个变量firstLevelIndexPos/secondLevelIndexPos来记录
+      this.firstLevelIndexArr = [];
+      this.secondLevelIndexArr = [];
+      this.indexDescArr = [];
+      for (var i = 0; i < data.length; i++) {
+        if (i === 0) {
+          this.firstLevelIndexArr.push(1);
+          this.firstLevelIndexPos = 0;
+        } else {
+          // 判断当前元素与上一个元素是否相同(第1和第2列)
+          if (data[i].gradeId === data[i - 1].gradeId) {
+            this.firstLevelIndexArr[this.firstLevelIndexPos] += 1;
+            this.firstLevelIndexArr.push(0);
           } else {
-            return {
-              rowspan: 0,
-              colspan: 0
-            };
+            this.firstLevelIndexArr.push(1);
+            this.firstLevelIndexPos = i;
           }
         }
       }
+    },
+    //按行合并
+    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        const _row = this.firstLevelIndexArr[rowIndex];
+        const _col = _row > 0 ? 1 : 0;
+        return {
+          rowspan: _row,
+          colspan: _col,
+        };
+      }
+    },
   },
 };
 </script>

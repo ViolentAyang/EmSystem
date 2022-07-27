@@ -20,27 +20,67 @@
         >
       </el-row>
     </div>
-    <el-alert title="修改毕业要求" type="success" :closable="false">
-    </el-alert>
+    <el-alert title="修改毕业要求" type="success" :closable="false"> </el-alert>
+
+    <div style="float: left; display: flex">
+      <el-select
+        style="
+          width: 140px;
+          margin-right: 10px;
+          margin-top: 10px;
+          margin-left: 10px;
+        "
+        v-model="yearFilter"
+        placeholder="选择年级查询"
+      >
+        <el-option
+          v-for="item in yearOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        >
+        </el-option>
+      </el-select>
+      <el-input
+        style="width: 180px; margin-right: 10px; margin-top: 10px"
+        v-model="majorFilter"
+        placeholder="请输入专业名"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-top: 10px; margin-right: 10px"
+        v-model="classFilter"
+        placeholder="请输入毕业要求编号"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-top: 10px; margin-right: 10px"
+        v-model="classFilter"
+        placeholder="请输入毕业要求内容"
+      ></el-input>
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="tableFilter"
+        type="primary"
+        icon="el-icon-search"
+        >搜索·</el-button
+      >
+    </div>
+
     <el-button
       style="
-        margin-right: 30px;
+        margin-right: 10px;
         margin-top: 10px;
         margin-bottom: 10px;
         float: right;
       "
-      @click="setClass"
+      @click="addRequire"
       type="success"
       >新增毕业要求</el-button
     >
-   
 
-   
-
-    <!--设置班级对话框-->
+    <!--新增毕业要求对话框-->
     <el-dialog
       title="设置班级"
-      :visible.sync="classDialogVisible"
+      :visible.sync="requireDialogVisible"
       width="40%"
       :before-close="handleClose"
     >
@@ -77,6 +117,7 @@
 
           <el-button
             style="margin-left: 10px"
+            @click="getCorrespondingMajor"
             icon="el-icon-search"
             circle
           ></el-button>
@@ -89,7 +130,11 @@
             trigger: 'blur',
           }"
         >
-          <el-select v-model="majorValue" placeholder="请选择">
+          <el-select
+            :disabled="showMajor"
+            v-model="majorValue"
+            placeholder="请选择"
+          >
             <el-option
               v-for="item in majorOptions"
               :key="item.value"
@@ -101,7 +146,7 @@
         </el-form-item>
         <el-form-item
           v-for="(domain, index) in dynamicValidateForm.domains"
-          :label="'专业' + index"
+          :label="'毕业要求' + index"
           :key="domain.key"
           :prop="'domains.' + index + '.value'"
           :rules="{
@@ -117,15 +162,81 @@
           <el-button type="primary" @click="submitForm('dynamicValidateForm')"
             >提交</el-button
           >
-          <el-button @click="addDomain">新增专业</el-button>
+          <el-button @click="addDomain">新增毕业要求</el-button>
           <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
-          <el-button type="danger" @click="yearDialogVisible = false"
-            >取 消</el-button
-          >
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!--修改毕业要求对话框-->
+    <el-dialog
+      title="设置班级"
+      :visible.sync="EditDialogVisible"
+      width="40%"
+      :before-close="handleCloseEdit"
+    >
+      <el-form
+        :model="dynamicValidateForm"
+        ref="dynamicValidateForm"
+        label-width="100px"
+        class="demo-dynamic"
+      >
+        <el-alert
+          style="margin-bottom: 5px"
+          title="选择年级后进行搜索可以获得该年级对应所有的专业"
+          type="warning"
+        >
+        </el-alert>
+        <el-form-item label="请选择年级">
+          <el-select v-model="yearValue" placeholder="请选择">
+            <el-option
+              v-for="item in yearOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
 
+          <el-button
+            style="margin-left: 10px"
+            @click="getCorrespondingMajor"
+            icon="el-icon-search"
+            circle
+          ></el-button>
+        </el-form-item>
+        <el-form-item label="请选择专业">
+          <el-select
+            :disabled="showMajor"
+            v-model="majorValue"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in majorOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="毕业要求">
+          <el-input
+            type="textarea"
+            placeholder="请输入内容"
+            v-model="textarea"
+            maxlength="100"
+            show-word-limit
+          >
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')"
+            >提交</el-button
+          >
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
     <!--显示用户下所有的班级年级专业-->
     <el-table
       :cell-style="{ textAlign: 'center' }"
@@ -137,14 +248,28 @@
       </el-table-column>
       <el-table-column header-align="center" prop="majorTable" label="专业">
       </el-table-column>
-      <el-table-column header-align="center" prop="classTable" label="毕业要求">
+      <el-table-column
+        header-align="center"
+        prop="requirementNo"
+        label="毕业要求编号"
+      >
       </el-table-column>
+      <el-table-column
+        header-align="center"
+        prop="requirementContent"
+        label="毕业要求内容"
+      >
+      </el-table-column>
+
       <el-table-column header-align="center" label="操作">
         <template slot-scope="scope">
           <el-button
             size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
+            type="primary"
+            @click="EditRequirement(scope.row)"
+            >修改</el-button
+          >
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
             >删除</el-button
           >
         </template>
@@ -157,11 +282,16 @@
 export default {
   data() {
     return {
-      yearValue: "", //设置专业时 选择年级下拉框的绑定值
-      majorValue: "", //设置班级时 选择专业下拉框的绑定值
-      yearDialogVisible: false, //设置年级对话框
-      majorDialogVisible: false, //设置专业对话框
-      classDialogVisible: false, //设置班级对话框
+      showMajor: true, //是否允许使用专业下拉框，若未选择年级则禁用
+      yearValue: "", //新增毕业要求 选择年级下拉框的绑定值
+      majorValue: "", //新增毕业要求 选择专业下拉框的绑定值
+      
+      requireDialogVisible: false, //新增毕业要求
+      EditDialogVisible: false, //修改毕业要求对话框
+      gradeSearch: {
+        //查询年级对应的专业
+        gradeId: "",
+      },
       dynamicValidateForm: {
         //动态表单增减
         domains: [
@@ -171,50 +301,28 @@ export default {
         ],
       },
       tableData: [
-        { yearTable: "2020", majorTable: "软件工程", classTable: "完成Java学习" },
-        { yearTable: "2020", majorTable: "软件工程", classTable: "完成Python学习" },
-        { yearTable: "2020", majorTable: "金融工程", classTable: "完成web学习" },
-        { yearTable: "2020", majorTable: "金融工程", classTable: "完成Java学习" },
-        { yearTable: "2020", majorTable: "土木工程", classTable: "完成大数据学习" },
-        { yearTable: "2020", majorTable: "土木工程", classTable: "完成Java学习" },
-      ],
-      classOptions: [
-        { id: "600", name: "1班" },
-        { id: "601", name: "2班" },
-        { id: "602", name: "3班" },
-        { id: "603", name: "4班" },
-        { id: "604", name: "5班" },
-        { id: "605", name: "6班" },
+        {
+          yearTable: "2020",
+          majorTable: "软件工程",
+          requirementNo: "01",
+          requirementContent: "需要学会开发",
+        },
       ],
       yearOptions: [
-        { id: "2019", name: "2019级学生" },
-        { id: "2020", name: "2020级学生" },
-        { id: "2021", name: "2021级学生" },
-        { id: "2022", name: "2022级学生" },
-        { id: "2023", name: "2023级学生" },
+        { id: "2018", name: "2018级" },
+        { id: "2019", name: "2019级" },
+        { id: "2020", name: "2020级" },
+        { id: "2021", name: "2021级" },
+        { id: "2022", name: "2022级" },
+        { id: "2023", name: "2023级" },
+        { id: "2024", name: "2024级" },
       ],
-      majorOptions: [
-        { value: "01", label: "会计学" },
-        { value: "02", label: "财务管理" },
-        { value: "03", label: "审计学" },
-        { value: "04", label: "金融学" },
-        { value: "05", label: "金融工程" },
-        { value: "06", label: "市场营销" },
-        { value: "07", label: "物流管理" },
-        { value: "08", label: "国际经济与贸易" },
-        { value: "09", label: "电子商务" },
-      ],
+      majorOptions: [],
     };
   },
   methods: {
-    setYear() {
-      this.yearDialogVisible = !this.yearDialogVisible;
-    },
-    setMajor() {
-      this.majorDialogVisible = !this.majorDialogVisible;
-    },
-    setClass() {
-      this.classDialogVisible = !this.classDialogVisible;
+    addRequire() {
+      this.requireDialogVisible = true;
     },
     data() {
       this.$router.push("/data");
@@ -231,10 +339,21 @@ export default {
     classManage() {
       this.$router.push("/class");
     },
-
+    //根据年级获取对应的专业
+    async getCorrespondingMajor() {
+      this.gradeSearch.gradeId = this.yearValue;
+      const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
+      console.log("测试查询专业");
+      console.log(res.data.majorData);
+      if (res.meta.status != "200") return this.$message.error("查询失败！");
+      this.majorOptions = res.data.majorData;
+      this.showMajor = false;
+      this.$message.success("查询成功！");
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          console.log(this.dynamicValidateForm);
           alert("submit!");
         } else {
           console.log("error submit!!");
@@ -257,16 +376,21 @@ export default {
         key: Date.now(),
       });
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    handleDelete(row) {
+      this.EditDialogVisible = true;
+      console.log(row);
     },
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    handleCloseEdit(){
+      this.EditDialogVisible = false;
     },
+    handleClose() {
+      this.requireDialogVisible = false;
+    },
+    //打开修改对话框后进行数据绑定
+    EditRequirement(row){
+
+      this.EditDialogVisible = true;
+    }
   },
 };
 </script>
