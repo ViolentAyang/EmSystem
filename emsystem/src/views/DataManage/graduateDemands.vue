@@ -48,12 +48,12 @@
       ></el-input>
       <el-input
         style="width: 180px; margin-top: 10px; margin-right: 10px"
-        v-model="classFilter"
+        v-model="noFilter"
         placeholder="请输入毕业要求编号"
       ></el-input>
       <el-input
         style="width: 180px; margin-top: 10px; margin-right: 10px"
-        v-model="classFilter"
+        v-model="contentFilter"
         placeholder="请输入毕业要求内容"
       ></el-input>
       <el-button
@@ -61,7 +61,14 @@
         @click="tableFilter"
         type="primary"
         icon="el-icon-search"
-        >搜索·</el-button
+        >搜索</el-button
+      >
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="resetSearch"
+        type="primary"
+        icon="el-icon-refresh"
+        >重置</el-button
       >
     </div>
 
@@ -85,11 +92,9 @@
       :before-close="handleClose"
     >
       <el-form
-        :inline="true"
-        :model="dynamicValidateForm"
-        ref="dynamicValidateForm"
+        :model="addValidateForm"
+        ref="addValidateForm"
         label-width="100px"
-        class="demo-dynamic"
       >
         <el-alert
           style="margin-bottom: 5px"
@@ -105,7 +110,7 @@
             trigger: 'blur',
           }"
         >
-          <el-select v-model="yearValue" placeholder="请选择">
+          <el-select v-model="addValidateForm.yearValue" placeholder="请选择">
             <el-option
               v-for="item in yearOptions"
               :key="item.id"
@@ -132,42 +137,37 @@
         >
           <el-select
             :disabled="showMajor"
-            v-model="majorValue"
+            v-model="addValidateForm.majorValue"
             placeholder="请选择"
           >
             <el-option
               v-for="item in majorOptions"
-              :key="item.value"
+              :key="item.label"
               :label="item.label"
-              :value="item.value"
+              :value="item.label"
             >
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item
-          v-for="(domain, index) in dynamicValidateForm.domains"
-          :label="'毕业要求' + index"
-          :key="domain.key"
-          :prop="'domains.' + index + '.value'"
-          :rules="{
-            required: true,
-            message: '专业不能为空',
-            trigger: 'blur',
-          }"
-        >
-          <el-input size="small" v-model="domain.value"></el-input
-          ><el-button @click.prevent="removeDomain(domain)">删除</el-button>
+        <el-form-item label="毕业要求">
+          <el-input
+            type="textarea"
+            placeholder="请输入内容"
+            v-model="addValidateForm.graText"
+            maxlength="100"
+            show-word-limit
+          >
+          </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('dynamicValidateForm')"
-            >提交</el-button
-          >
-          <el-button @click="addDomain">新增毕业要求</el-button>
-          <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
+          <el-button type="primary" @click="submitForm()">提交</el-button>
+          <el-button @click="resetFormAdd()">重置</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
+
     <!--修改毕业要求对话框-->
+
     <el-dialog
       title="设置班级"
       :visible.sync="EditDialogVisible"
@@ -175,10 +175,9 @@
       :before-close="handleCloseEdit"
     >
       <el-form
-        :model="dynamicValidateForm"
-        ref="dynamicValidateForm"
+        :model="editValidateForm"
+        ref="editValidateForm"
         label-width="100px"
-        class="demo-dynamic"
       >
         <el-alert
           style="margin-bottom: 5px"
@@ -187,7 +186,7 @@
         >
         </el-alert>
         <el-form-item label="请选择年级">
-          <el-select v-model="yearValue" placeholder="请选择">
+          <el-select v-model="editValidateForm.yearValue" placeholder="请选择">
             <el-option
               v-for="item in yearOptions"
               :key="item.id"
@@ -199,22 +198,22 @@
 
           <el-button
             style="margin-left: 10px"
-            @click="getCorrespondingMajor"
+            @click="getCorrespondingMajorEdit"
             icon="el-icon-search"
             circle
           ></el-button>
         </el-form-item>
         <el-form-item label="请选择专业">
           <el-select
-            :disabled="showMajor"
-            v-model="majorValue"
+            :disabled="showMajorEdit"
+            v-model="editValidateForm.majorValue"
             placeholder="请选择"
           >
             <el-option
               v-for="item in majorOptions"
-              :key="item.value"
+              :key="item.id"
               :label="item.label"
-              :value="item.value"
+              :value="item.id"
             >
             </el-option>
           </el-select>
@@ -223,17 +222,17 @@
           <el-input
             type="textarea"
             placeholder="请输入内容"
-            v-model="textarea"
+            v-model="editValidateForm.graText"
             maxlength="100"
             show-word-limit
           >
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('ruleForm')"
+          <el-button type="primary" @click="submitFormEdit()"
             >提交</el-button
           >
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
+          <el-button @click="resetFormEdit()">重置</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -244,19 +243,19 @@
       border
       style="width: 100%"
     >
-      <el-table-column header-align="center" prop="yearTable" label="年级">
+      <el-table-column header-align="center" prop="gradeId" label="年级">
       </el-table-column>
-      <el-table-column header-align="center" prop="majorTable" label="专业">
+      <el-table-column header-align="center" prop="majorName" label="专业">
       </el-table-column>
       <el-table-column
         header-align="center"
-        prop="requirementNo"
+        prop="noSearch"
         label="毕业要求编号"
       >
       </el-table-column>
       <el-table-column
         header-align="center"
-        prop="requirementContent"
+        prop="contentSearch"
         label="毕业要求内容"
       >
       </el-table-column>
@@ -282,32 +281,46 @@
 export default {
   data() {
     return {
+      yearFilter: "", //过滤年级
+      majorFilter: "", //过滤专业
+      noFilter: "", //过滤毕业要求编号
+      contentFilter: "", //过滤毕业要求内容
+
+      showMajorEdit: true, //修改页面 防止接口冲突
       showMajor: true, //是否允许使用专业下拉框，若未选择年级则禁用
       yearValue: "", //新增毕业要求 选择年级下拉框的绑定值
       majorValue: "", //新增毕业要求 选择专业下拉框的绑定值
-      
       requireDialogVisible: false, //新增毕业要求
       EditDialogVisible: false, //修改毕业要求对话框
       gradeSearch: {
         //查询年级对应的专业
         gradeId: "",
       },
-      dynamicValidateForm: {
-        //动态表单增减
-        domains: [
-          {
-            value: "",
-          },
-        ],
+      //新增对话框绑定的
+      addValidateForm: {
+        yearValue: "",
+        majorValue: "",
+        graText: "",
       },
-      tableData: [
-        {
-          yearTable: "2020",
-          majorTable: "软件工程",
-          requirementNo: "01",
-          requirementContent: "需要学会开发",
-        },
-      ],
+      //前端新增发送的请求
+      addNewReq: {
+        gradeSearch: "",
+        majorSearch: "",
+        contentSearch: "",
+      },
+      editValidateForm: {
+        yearValue: "",
+        majorValue: "",
+        graText: "",
+      },
+      editForm: {
+        uid: "",
+        gradeSearch: "",
+        majorSearch: "",
+        noSearch: "", 
+        contentSearch: "",
+      },
+      tableData: [],
       yearOptions: [
         { id: "2018", name: "2018级" },
         { id: "2019", name: "2019级" },
@@ -318,9 +331,38 @@ export default {
         { id: "2024", name: "2024级" },
       ],
       majorOptions: [],
+      searchAll: {
+        gradeSearch: "",
+        majorSearch: "",
+        noSearch: "",
+        contentSearch: "",
+      },
+      //删除数组
+      deleteArray: {
+        reqArray: [],
+      },
     };
   },
+  created() {
+    // 页面初始化函数
+    this.getList();
+  },
   methods: {
+    async getList() {
+      const { data: res } = await this.$http.post(
+        "getAllGraduationReq",
+        this.searchAll
+      );
+      if (res.meta.status != "200") return this.$message.error("获取失败！");
+      this.$message.success("获取成功！");
+      //新增动态合并
+      this.tableData = res.data.tableData;
+      //this.Alldata = this.tableData;
+      //this.getSpanArr(this.Alldata);
+      //console.log(res.data.tableData);
+      //console.log("测试初始化数据");
+      //console.log(res);
+    },
     addRequire() {
       this.requireDialogVisible = true;
     },
@@ -339,58 +381,116 @@ export default {
     classManage() {
       this.$router.push("/class");
     },
+    //大表格数据过滤
+    async tableFilter() {
+      this.searchAll.gradeSearch = this.yearFilter;
+      this.searchAll.majorSearch = this.majorFilter;
+      this.searchAll.noSearch = this.noFilter;
+      this.searchAll.contentSearch = this.contentFilter;
+      const { data: res } = await this.$http.post(
+        "getAllGraduationReq",
+        this.searchAll
+      );
+      if (res.meta.status != "200") return this.$message.error("获取失败！");
+      this.$message.success("获取成功！");
+      this.tableData = res.data.tableData;
+      this.resetSearch();
+    },
+    //重置大表格搜索
+    resetSearch() {
+      this.yearFilter = "";
+      this.majorFilter = "";
+      this.noFilter = "";
+      this.contentFilter = "";
+    },
     //根据年级获取对应的专业
     async getCorrespondingMajor() {
-      this.gradeSearch.gradeId = this.yearValue;
+      this.gradeSearch.gradeId = this.addValidateForm.yearValue;
       const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
-      console.log("测试查询专业");
-      console.log(res.data.majorData);
+      //console.log("测试查询专业");
+      //console.log(res.data.majorData);
       if (res.meta.status != "200") return this.$message.error("查询失败！");
       this.majorOptions = res.data.majorData;
       this.showMajor = false;
       this.$message.success("查询成功！");
     },
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          console.log(this.dynamicValidateForm);
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    async getCorrespondingMajorEdit() {
+      this.gradeSearch.gradeId = this.yearValue;
+      const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
+      //console.log("测试查询专业");
+      //console.log(res.data.majorData);
+      if (res.meta.status != "200") return this.$message.error("查询失败！");
+      this.majorOptions = res.data.majorData;
+      this.showMajorEdit = false;
+      this.$message.success("查询成功！");
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    //新增毕业要求
+    async submitForm() {
+      this.addNewReq.gradeSearch = this.addValidateForm.yearValue;
+      this.addNewReq.majorSearch = this.addValidateForm.majorValue;
+      this.addNewReq.contentSearch = this.addValidateForm.graText;
+      //console.log(this.addNewReq)
+      const { data: res } = await this.$http.post(
+        "addGraduationReq",
+        this.addNewReq
+      );
+      if (res.meta.status != "200") return this.$message.error("新增失败！");
+      this.$message.success("新增成功！");
+      this.getList();
+      this.resetFormAdd();
     },
-    removeDomain(item) {
-      var index = this.dynamicValidateForm.domains.indexOf(item);
-      if (index !== -1) {
-        this.dynamicValidateForm.domains.splice(index, 1);
-      }
+    resetFormAdd() {
+      (this.addValidateForm.yearValue = ""),
+        (this.addValidateForm.majorValue = ""),
+        (this.addValidateForm.graText = "");
     },
-    addDomain() {
-      this.dynamicValidateForm.domains.push({
-        value: "",
-        key: Date.now(),
-      });
+    resetFormEdit() {
+      (this.editValidateForm.yearValue = ""),
+        (this.editValidateForm.majorValue = ""),
+        (this.editValidateForm.graText = "");
     },
-    handleDelete(row) {
-      this.EditDialogVisible = true;
-      console.log(row);
+    async handleDelete(row) {
+      //console.log(row.uid);
+      this.deleteArray.reqArray.push(row.uid);
+      //console.log(this.deleteArray)
+      const { data: res } = await this.$http.post(
+        "deleteGraduationReq",
+        this.deleteArray
+      );
+      if (res.meta.status != "200") return this.$message.error("删除失败！");
+      this.$message.success("删除成功！");
+      this.getList();
     },
-    handleCloseEdit(){
+    handleCloseEdit() {
       this.EditDialogVisible = false;
+      this.editForm.uid = ""
     },
     handleClose() {
       this.requireDialogVisible = false;
     },
+    async submitFormEdit(){
+      this.editForm.gradeSearch = this.editValidateForm.yearValue;
+      this.editForm.majorSearch = this.editValidateForm.majorValue;
+      this.editForm.contentSearch = this.editValidateForm.graText;
+      const { data: res } = await this.$http.post(
+        "editGraduationReq",
+        this.editForm
+      );
+      if (res.meta.status != "200") return this.$message.error("修改失败！");
+      this.$message.success("修改成功！");
+      this.handleCloseEdit()
+      this.getList();
+    },
     //打开修改对话框后进行数据绑定
-    EditRequirement(row){
-
+    EditRequirement(row) {
+      //console.log("测试修改对话框数据绑定")
+      //console.log(row)
+      this.editForm.uid = row.uid; //打开对话框时，把uid就已经绑定上，关闭页面时清空
+      this.editValidateForm.yearValue = row.gradeId;
+      this.editValidateForm.majorValue = row.majorName;
+      this.editValidateForm.graText = row.contentSearch;
       this.EditDialogVisible = true;
-    }
+    },
   },
 };
 </script>
