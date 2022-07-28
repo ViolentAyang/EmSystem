@@ -10,6 +10,7 @@ import yearMajorClass from '../views/DataManage/yearMajorClass.vue'
 import point from '../views/DataManage/point.vue'
 import trainingPlan from '../views/DataManage/trainingPlan.vue'
 import assign from '../views/DataManage/assign.vue'
+import supportEstate from '../views/DataManage/supportEstate.vue'
 
 Vue.use(VueRouter)
 
@@ -72,6 +73,11 @@ const routes = [
     path: '/assign',
     name: 'assign',
     component: assign
+  },
+  {
+    path: '/supportEstate',
+    name: 'supportEstate',
+    component: supportEstate
   },
   //{
     //path: '/about',

@@ -53,8 +53,8 @@ export default {
               icon: 'el-icon-document',
               color: '	#7B68EE'
             }, {
-              click: function (item) {
-                alert(JSON.stringify(item));
+               click: function (item) {
+                window.location.replace("/#/supportEstate");
               },
               count: '支撑等级设置',
               title: '设置达成等级数、支撑等级数及评分等级数、师生评分比例',
