@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
@@ -18,7 +18,7 @@
           plain
           >关于我们</el-button
         >
-      </el-row>
+      </div>
     </div>
     <el-alert title="分配指标点" type="success" :closable="false">
     </el-alert>
@@ -155,6 +155,7 @@
 export default {
   data() {
     return {
+      userId: '',
       yearValue: "", //设置专业时 选择年级下拉框的绑定值
       majorValue: "", //设置班级时 选择专业下拉框的绑定值
       yearDialogVisible: false, //设置年级对话框
@@ -204,6 +205,9 @@ export default {
       ],
     };
   },
+  created(){
+    this.getUserId()
+  },
   methods: {
     setYear() {
       this.yearDialogVisible = !this.yearDialogVisible;
@@ -214,20 +218,38 @@ export default {
     setClass() {
       this.classDialogVisible = !this.classDialogVisible;
     },
+    getUserId() {
+      this.userId = this.$route.params.userId;
+    },
     data() {
-      this.$router.push("/data");
+      this.$router.push({
+        name: "Data",
+        params: { userId: this.userId },
+      });
     },
     home() {
-      this.$router.push("/home");
+      this.$router.push({
+        name: "Home",
+        params: { userId: this.userId },
+      });
     },
     user() {
-      this.$router.push("/user");
+      this.$router.push({
+        name: "User",
+        params: { userId: this.userId },
+      });
     },
     about() {
-      this.$router.push("/about");
+      this.$router.push({
+        name: "About",
+        params: { userId: this.userId },
+      });
     },
     classManage() {
-      this.$router.push("/class");
+      this.$router.push({
+        name: "Class",
+        params: { userId: this.userId },
+      });
     },
 
     submitForm(formName) {

@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="dataClick" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
@@ -18,7 +18,7 @@
           plain
           >关于我们</el-button
         >
-      </el-row>
+      </div>
     </div>
     <el-alert title="设置班级 年级 专业" type="success" :closable="false">
     </el-alert>
@@ -271,6 +271,7 @@
 export default {
   data() {
     return {
+      userId: '',
       showMajor: true, //是否允许使用专业下拉框，若未选择年级则禁用
       yearFilter: "", //大表格进行筛选年级
       majorFilter: "", //大表格进行筛选专业
@@ -332,12 +333,18 @@ export default {
       ],
       majorOptions: [],
       data: [], //列表数据
+      indexDescArr: [],
       firstLevelIndexArr: [], // 一个空的数组，用于存放第一列每一行记录的合并数  控制第一列的合并
       firstLevelIndexPos: 0, // firstLevelIndexArr 的索引
+      spanArr1: [], // 记录每一行的合并数
+      pos1: "", // 记录索引
+      spanArr2: [], // 记录每一行的合并数
+      pos2: "", // 记录索引
     };
   },
   created() {
     // 页面初始化函数
+    this.getUserId();
     this.getList();
   },
   methods: {
@@ -366,20 +373,38 @@ export default {
     setClass() {
       this.classDialogVisible = !this.classDialogVisible;
     },
+   getUserId() {
+      this.userId = this.$route.params.userId;
+    },
     dataClick() {
-      this.$router.push("/data");
+      this.$router.push({
+        name: "Data",
+        params: { userId: this.userId },
+      });
     },
     home() {
-      this.$router.push("/home");
+      this.$router.push({
+        name: "Home",
+        params: { userId: this.userId },
+      });
     },
     user() {
-      this.$router.push("/user");
+      this.$router.push({
+        name: "User",
+        params: { userId: this.userId },
+      });
     },
     about() {
-      this.$router.push("/about");
+      this.$router.push({
+        name: "About",
+        params: { userId: this.userId },
+      });
     },
     classManage() {
-      this.$router.push("/class");
+      this.$router.push({
+        name: "Class",
+        params: { userId: this.userId },
+      });
     },
 
     //设置专业的函数
@@ -448,6 +473,7 @@ export default {
       console.log(res);
       if (res.meta.status != "200") return this.$message.error("删除失败！");
       this.getList();
+      //this.$router.go(0);
       this.$message.success("删除成功！");
     },
     //设置班级的函数
@@ -487,6 +513,7 @@ export default {
           this.getList();
           this.$message.success("添加成功！");
           this.classDialogVisible = false;
+          //this.$router.go(0)
           //console.log(this.ClassdynamicValidateForm.domains[0].value);
           this.resetFormClass(formName);
           //alert("提交成功!");
@@ -552,30 +579,59 @@ export default {
     },
     //动态合并表格
     getSpanArr(data) {
-      // firstLevelIndexArr/secondLevelIndexArr来存放要合并的格数，同时还要设定一个变量firstLevelIndexPos/secondLevelIndexPos来记录
-      this.firstLevelIndexArr = [];
-      this.secondLevelIndexArr = [];
-      this.indexDescArr = [];
-      for (var i = 0; i < data.length; i++) {
+      (this.spanArr1 = []), // 记录每一行的合并数
+        (this.pos1 = ""), // 记录索引
+        (this.spanArr2 = []), // 记录每一行的合并数
+        (this.pos2 = ""); // 记录索引
+      for (let i = 0; i < data.length; i++) {
+        // 第一列
         if (i === 0) {
-          this.firstLevelIndexArr.push(1);
-          this.firstLevelIndexPos = 0;
+          this.spanArr1.push(1);
+          this.pos1 = 0;
         } else {
-          // 判断当前元素与上一个元素是否相同(第1和第2列)
+          // 判断当前元素与上一个元素是否相同
           if (data[i].gradeId === data[i - 1].gradeId) {
-            this.firstLevelIndexArr[this.firstLevelIndexPos] += 1;
-            this.firstLevelIndexArr.push(0);
+            this.spanArr1[this.pos1] += 1;
+            this.spanArr1.push(0);
           } else {
-            this.firstLevelIndexArr.push(1);
-            this.firstLevelIndexPos = i;
+            this.spanArr1.push(1);
+            this.pos1 = i;
+          }
+        }
+      }
+      for (let i = 0; i < data.length; i++) {
+        // 第二列
+        if (i === 0) {
+          this.spanArr2.push(1);
+          this.pos2 = 0;
+        } else {
+          // 判断当前元素与上一个元素是否相同
+          if (
+            data[i].gradeId === data[i - 1].gradeId &&
+            data[i].majorName === data[i - 1].majorName
+          ) {
+            this.spanArr2[this.pos2] += 1;
+            this.spanArr2.push(0);
+          } else {
+            this.spanArr2.push(1);
+            this.pos2 = i;
           }
         }
       }
     },
-    //按行合并
     objectSpanMethod({ row, column, rowIndex, columnIndex }) {
       if (columnIndex === 0) {
-        const _row = this.firstLevelIndexArr[rowIndex];
+        // 第一列
+        const _row = this.spanArr1[rowIndex];
+        const _col = _row > 0 ? 1 : 0;
+        return {
+          rowspan: _row,
+          colspan: _col,
+        };
+      }
+      if (columnIndex === 1) {
+        // 第二列
+        const _row = this.spanArr2[rowIndex];
         const _col = _row > 0 ? 1 : 0;
         return {
           rowspan: _row,

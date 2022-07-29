@@ -34,16 +34,14 @@
         </div>
       </div>
       <div class="butt">
-        <el-button type="primary" @click="login"
-          >登录</el-button
-        >
+        <el-button type="primary" @click="login">登录</el-button>
         <el-button class="shou" @click="register">注册</el-button>
       </div>
 
       <!--注册-->
     </div>
     <el-dialog
-      :modal=false
+      :modal="false"
       title="注册"
       :visible.sync="dialogVisible"
       width="30%"
@@ -57,7 +55,7 @@
         label-width="100px"
         class="demo-ruleFormReg"
       >
-      <el-form-item label="用户名" prop="name">
+        <el-form-item label="用户名" prop="name">
           <el-input
             type="name"
             v-model="ruleFormReg.name"
@@ -75,9 +73,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="registerCommit"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="registerCommit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -88,16 +84,17 @@ export default {
   name: "login",
   data() {
     return {
+      userId: "",
       dialogVisible: false,
       form: {
         username: "",
         password: "",
       },
-      ruleFormReg:{
+      ruleFormReg: {
         name: "",
         pass: "",
       },
-      registerdata:{
+      registerdata: {
         username: "",
         password: "",
       },
@@ -121,7 +118,7 @@ export default {
           { required: true, message: "请输入密码", trigger: "blur" },
           { max: 10, message: "不能大于10个字符", trigger: "blur" },
         ],
-      }
+      },
     };
   },
   mounted() {
@@ -132,15 +129,19 @@ export default {
   },
   methods: {
     login(form) {
-      this.$refs.formRef.validate(async valid=>{
-        if(!valid) return;
-        const {data:res} = await this.$http.post("login",this.form);
-        if(res.meta.status!='200') return this.$message.error('登录失败！');
-        this.$message.success('登录成功！');
-        console.log(res);
-        window.sessionStorage.setItem('token',res.data.token);
-        this.$router.push('/home');
-      })
+      this.$refs.formRef.validate(async (valid) => {
+        if (!valid) return;
+        const { data: res } = await this.$http.post("login", this.form);
+        if (res.meta.status != "200") return this.$message.error("登录失败！");
+        this.$message.success("登录成功！");
+        this.userId = res.data.userId;
+        //console.log(res.data.userId);
+        window.sessionStorage.setItem("token", res.data.token);
+        this.$router.push({
+          name: "Home", 
+          params: { userId: this.userId },
+        });
+      });
     },
     remenber(data) {
       this.checked = data;
@@ -160,20 +161,23 @@ export default {
     register() {
       this.dialogVisible = true;
     },
-    registerCommit(){
-      this.registerdata.username = this.ruleFormReg.name
-      this.registerdata.password = this.ruleFormReg.pass
-      this.$refs.ruleFormRef.validate(async valid=>{
-        if(!valid) return;
-        const {data:res} = await this.$http.post("register",this.registerdata);
-        if(res.meta.status!='200') return this.$message.error('注册失败！');
-        this.$message.success('注册成功！');
-      })
+    registerCommit() {
+      this.registerdata.username = this.ruleFormReg.name;
+      this.registerdata.password = this.ruleFormReg.pass;
+      this.$refs.ruleFormRef.validate(async (valid) => {
+        if (!valid) return;
+        const { data: res } = await this.$http.post(
+          "register",
+          this.registerdata
+        );
+        if (res.meta.status != "200") return this.$message.error("注册失败！");
+        this.$message.success("注册成功！");
+      });
       this.dialogVisible = false;
     },
-    handleClose(){
+    handleClose() {
       this.dialogVisible = false;
-    }
+    },
   },
 };
 </script>

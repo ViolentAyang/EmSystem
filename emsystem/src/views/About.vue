@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
@@ -18,16 +18,12 @@
           plain
           >关于我们</el-button
         >
-      </el-row>
+      </div>
     </div>
     <avue-data-cardtext :option="option"></avue-data-cardtext>
-     <el-alert
-    title="团队成员介绍"
-    type="success"
-    :closable="false">
-  </el-alert>
+    <el-alert title="团队成员介绍" type="success" :closable="false"> </el-alert>
     <!--<avue-data-card :option="option2"></avue-data-card>-->
-       <el-carousel type="card" height="322px">
+    <el-carousel type="card" height="322px">
       <el-carousel-item v-for="item in carouseData" :key="item">
         <img :src="item.url" alt="" />
       </el-carousel-item>
@@ -40,10 +36,11 @@
 export default {
   data() {
     return {
+      userId: '',
       option: {
         span: 6,
         data: [
-            {
+          {
             /*click: function (item) {
               alert(JSON.stringify(item));
             },*/
@@ -83,7 +80,7 @@ export default {
             name: "Project Content",
             date: "1天前",
           },
-          
+
           {
             /*click: function (item) {
               alert(JSON.stringify(item));
@@ -99,22 +96,22 @@ export default {
           },
         ],
       },
-       carouseData: [
+      carouseData: [
         { url: require("../assets/11.png") },
         { url: require("../assets/22.png") },
         { url: require("../assets/33.png") },
         { url: require("../assets/44.png") },
       ],
       option1: {
-        span:6,
+        span: 6,
         data: [
-        {
+          {
             click: function (item) {
               alert(JSON.stringify(item));
             },
-            count: '16',
-            decimals:2,
-            title: '日活跃数',
+            count: "16",
+            decimals: 2,
+            title: "日活跃数",
             //href:'https://avuejs.com',
             //target:'_blank'
           },
@@ -122,8 +119,8 @@ export default {
             click: function (item) {
               alert(JSON.stringify(item));
             },
-            count: '210',
-            title: '月活跃数',
+            count: "210",
+            title: "月活跃数",
             //href:'https://avuejs.com',
             //target:'_blank'
           },
@@ -131,21 +128,21 @@ export default {
             click: function (item) {
               alert(JSON.stringify(item));
             },
-            count: '1500',
-            title: '年活跃数',
+            count: "1500",
+            title: "年活跃数",
             //href:'https://avuejs.com',
-           // target:'_blank'
+            // target:'_blank'
           },
           {
             click: function (item) {
               alert(JSON.stringify(item));
             },
-            count: '30',
-            title: '周活跃数',
+            count: "30",
+            title: "周活跃数",
             //href:'https://avuejs.com',
             //target:'_blank'
-          }
-        ]
+          },
+        ],
       },
       /*option2: {
         span:6,
@@ -194,23 +191,41 @@ export default {
       },*/
     };
   },
-   methods:{
-    data(){
-      this.$router.push('/data');
+  created() {
+    this.getUserId();
+  },
+  methods: {
+    getUserId() {
+      this.userId = this.$route.params.userId;
     },
-    home(){
-      this.$router.push('/home');
+    data() {
+      this.$router.push({
+        name: "Data",
+        params: { userId: this.userId },
+      });
     },
-    user(){
-      this.$router.push('/user');
+    home() {
+      this.$router.push({
+        name: "Home",
+        params: { userId: this.userId },
+      });
     },
-    about(){
-      window.location.reload()
+    user() {
+      this.$router.push({
+        name: "User",
+        params: { userId: this.userId },
+      });
     },
-    classManage(){
-      this.$router.push('/class');
-    }
-  }
+    about() {
+      window.location.reload();
+    },
+    classManage() {
+      this.$router.push({
+        name: "Class",
+        params: { userId: this.userId },
+      });
+    },
+  },
 };
 </script>
 

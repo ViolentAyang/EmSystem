@@ -22,24 +22,44 @@
 export default {
   data(){
     return{
-
+      userId: ''
     }
   },
+  created(){
+    this.getUserId()
+  },
   methods:{
+    getUserId(){
+      this.userId = this.$route.params.userId
+    },
     data(){
-      this.$router.push('/data');
+      this.$router.push({
+          name: "Data", 
+          params: { userId: this.userId },
+        });
     },
     home(){
       window.location.reload()
+      //this.userId = this.$route.params.userId
+      //console.log(this.userId)
     },
     user(){
-      this.$router.push('/user');
+      this.$router.push({
+          name: "User", 
+          params: { userId: this.userId },
+        });
     },
     about(){
-      this.$router.push('/about');
+      this.$router.push({
+          name: "About", 
+          params: { userId: this.userId },
+        });
     },
     classManage(){
-      this.$router.push('/class');
+      this.$router.push({
+          name: "Class", 
+          params: { userId: this.userId },
+        });
     }
   }
 };

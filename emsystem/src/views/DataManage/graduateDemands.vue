@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
@@ -18,7 +18,7 @@
           plain
           >关于我们</el-button
         >
-      </el-row>
+      </div>
     </div>
     <el-alert title="修改毕业要求" type="success" :closable="false"> </el-alert>
 
@@ -238,8 +238,9 @@
     </el-dialog>
     <!--显示用户下所有的班级年级专业-->
     <el-table
+      :span-method="objectSpanMethod"
       :cell-style="{ textAlign: 'center' }"
-      :data="tableData"
+      :data="Alldata"
       border
       style="width: 100%"
     >
@@ -281,6 +282,7 @@
 export default {
   data() {
     return {
+      userId: '',
       yearFilter: "", //过滤年级
       majorFilter: "", //过滤专业
       noFilter: "", //过滤毕业要求编号
@@ -341,10 +343,16 @@ export default {
       deleteArray: {
         reqArray: [],
       },
+      Alldata:[],
+      spanArr1: [], // 记录每一行的合并数
+      pos1: '', // 记录索引
+      spanArr2: [], // 记录每一行的合并数
+      pos2: '' // 记录索引
     };
   },
   created() {
     // 页面初始化函数
+    this.getUserId();
     this.getList();
   },
   methods: {
@@ -357,8 +365,8 @@ export default {
       this.$message.success("获取成功！");
       //新增动态合并
       this.tableData = res.data.tableData;
-      //this.Alldata = this.tableData;
-      //this.getSpanArr(this.Alldata);
+      this.Alldata = this.tableData;
+      this.getSpanArr(this.Alldata);
       //console.log(res.data.tableData);
       //console.log("测试初始化数据");
       //console.log(res);
@@ -366,20 +374,38 @@ export default {
     addRequire() {
       this.requireDialogVisible = true;
     },
+    getUserId() {
+      this.userId = this.$route.params.userId;
+    },
     data() {
-      this.$router.push("/data");
+      this.$router.push({
+        name: "Data",
+        params: { userId: this.userId },
+      });
     },
     home() {
-      this.$router.push("/home");
+      this.$router.push({
+        name: "Home",
+        params: { userId: this.userId },
+      });
     },
     user() {
-      this.$router.push("/user");
+      this.$router.push({
+        name: "User",
+        params: { userId: this.userId },
+      });
     },
     about() {
-      this.$router.push("/about");
+      this.$router.push({
+        name: "About",
+        params: { userId: this.userId },
+      });
     },
     classManage() {
-      this.$router.push("/class");
+      this.$router.push({
+        name: "Class",
+        params: { userId: this.userId },
+      });
     },
     //大表格数据过滤
     async tableFilter() {
@@ -450,9 +476,9 @@ export default {
         (this.editValidateForm.graText = "");
     },
     async handleDelete(row) {
-      //console.log(row.uid);
+      console.log(row.uid);
       this.deleteArray.reqArray.push(row.uid);
-      //console.log(this.deleteArray)
+      console.log(this.deleteArray)
       const { data: res } = await this.$http.post(
         "deleteGraduationReq",
         this.deleteArray
@@ -491,6 +517,62 @@ export default {
       this.editValidateForm.graText = row.contentSearch;
       this.EditDialogVisible = true;
     },
+    //动态合并表格
+   getSpanArr (data) {
+    (this.spanArr1 = []), // 记录每一行的合并数
+        (this.pos1 = ""), // 记录索引
+        (this.spanArr2 = []), // 记录每一行的合并数
+        (this.pos2 = ""); // 记录索引
+        for (let i = 0; i < data.length; i++) { // 第一列
+            if (i === 0) {
+                this.spanArr1.push(1)
+                this.pos1 = 0
+            } else {
+                // 判断当前元素与上一个元素是否相同
+                if (data[i].gradeId === data[i - 1].gradeId) {
+                    this.spanArr1[this.pos1] += 1
+                    this.spanArr1.push(0)
+                } else {
+                    this.spanArr1.push(1)
+                    this.pos1 = i
+                }
+            }
+        }
+        for (let i = 0; i < data.length; i++) { // 第二列
+            if (i === 0) {
+                this.spanArr2.push(1)
+                this.pos2 = 0
+            } else {
+                // 判断当前元素与上一个元素是否相同
+                if (data[i].gradeId === data[i - 1].gradeId && data[i].majorName === data[i - 1].majorName) {
+                    this.spanArr2[this.pos2] += 1
+                    this.spanArr2.push(0)
+                } else {
+                    this.spanArr2.push(1)
+                    this.pos2 = i
+                }
+            }
+        }
+      },
+      objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+        if (columnIndex === 0) { // 第一列
+          const _row = this.spanArr1[rowIndex]
+          const _col = _row > 0 ? 1 : 0
+          return {
+            rowspan: _row,
+            colspan: _col
+          }
+        }
+        if (columnIndex === 1) { // 第二列
+          const _row = this.spanArr2[rowIndex]
+          const _col = _row > 0 ? 1 : 0
+          return {
+            rowspan: _row,
+            colspan: _col
+          }
+        }
+      }
+
   },
 };
 </script>

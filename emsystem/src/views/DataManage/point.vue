@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
@@ -18,10 +18,34 @@
           plain
           >关于我们</el-button
         >
-      </el-row>
+      </div>
     </div>
     <el-alert title="设置指标点" type="success" :closable="false">
     </el-alert>
+    <div style="float: left; display: flex">
+        <el-input
+        style="width: 180px; margin-left: 10px;margin-right: 10px;  margin-top: 10px"
+        v-model="majorFilter"
+        placeholder="请输入毕业要求编号"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-right: 10px; margin-top: 10px"
+        v-model="majorFilter"
+        placeholder="请输入指标点编号"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-top: 10px; margin-right: 10px"
+        v-model="classFilter"
+        placeholder="请输入指标点内容"
+      ></el-input>
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="tableFilter"
+        type="primary"
+        icon="el-icon-search"
+        >搜索·</el-button
+      >
+    </div>
     <el-button
       style="
         margin-right: 30px;
@@ -49,68 +73,7 @@
         label-width="100px"
         class="demo-dynamic"
       >
-        <el-alert
-          style="margin-bottom: 5px"
-          title="选择年级后进行搜索可以获得该年级对应所有的专业"
-          type="warning"
-        >
-        </el-alert>
-        <el-form-item
-          label="请选择年级"
-          :rules="{
-            required: true,
-            message: '必须先选年级',
-            trigger: 'blur',
-          }"
-        >
-          <el-select v-model="yearValue" placeholder="请选择">
-            <el-option
-              v-for="item in yearOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            >
-            </el-option>
-          </el-select>
-
-          <el-button
-            style="margin-left: 10px"
-            icon="el-icon-search"
-            circle
-          ></el-button>
-        </el-form-item>
-        <el-form-item
-          label="请选择专业"
-          :rules="{
-            required: true,
-            message: '必须先选专业',
-            trigger: 'blur',
-          }"
-        >
-          <el-select v-model="majorValue" placeholder="请选择">
-            <el-option
-              v-for="item in majorOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          v-for="(domain, index) in dynamicValidateForm.domains"
-          :label="'专业' + index"
-          :key="domain.key"
-          :prop="'domains.' + index + '.value'"
-          :rules="{
-            required: true,
-            message: '专业不能为空',
-            trigger: 'blur',
-          }"
-        >
-          <el-input size="small" v-model="domain.value"></el-input
-          ><el-button @click.prevent="removeDomain(domain)">删除</el-button>
-        </el-form-item>
+        
         <el-form-item>
           <el-button type="primary" @click="submitForm('dynamicValidateForm')"
             >提交</el-button
@@ -141,6 +104,12 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
+            type="primary"
+            @click="EditRequirement(scope.row)"
+            >修改</el-button
+          >
+          <el-button
+            size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
             >删除</el-button
@@ -155,6 +124,7 @@
 export default {
   data() {
     return {
+      userId: '',
       yearValue: "", //设置专业时 选择年级下拉框的绑定值
       majorValue: "", //设置班级时 选择专业下拉框的绑定值
       yearDialogVisible: false, //设置年级对话框
@@ -204,6 +174,9 @@ export default {
       ],
     };
   },
+  created() {
+    this.getUserId();
+  },
   methods: {
     setYear() {
       this.yearDialogVisible = !this.yearDialogVisible;
@@ -214,20 +187,38 @@ export default {
     setClass() {
       this.classDialogVisible = !this.classDialogVisible;
     },
+   getUserId() {
+      this.userId = this.$route.params.userId;
+    },
     data() {
-      this.$router.push("/data");
+      this.$router.push({
+        name: "Data",
+        params: { userId: this.userId },
+      });
     },
     home() {
-      this.$router.push("/home");
+      this.$router.push({
+        name: "Home",
+        params: { userId: this.userId },
+      });
     },
     user() {
-      this.$router.push("/user");
+      this.$router.push({
+        name: "User",
+        params: { userId: this.userId },
+      });
     },
     about() {
-      this.$router.push("/about");
+      this.$router.push({
+        name: "About",
+        params: { userId: this.userId },
+      });
     },
     classManage() {
-      this.$router.push("/class");
+      this.$router.push({
+        name: "Class",
+        params: { userId: this.userId },
+      });
     },
 
     submitForm(formName) {

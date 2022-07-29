@@ -45,17 +45,18 @@ export default {
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value !== this.obj.newpassword) {
+      } else if (value !== this.obj.newPassword) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
       }
     };
     return {
+      userId: '',
       pwdcommit: {
         username: "",
         password: "",
-        newpassword: "",
+        newPassword: "",
       },
       obj: {},
       option1: {
@@ -79,7 +80,7 @@ export default {
           },
           {
             label: "新密码",
-            prop: "newpassword",
+            prop: "newPassword",
             type: "password",
             rules: [{ validator: validatePass, trigger: "blur" }],
           },
@@ -93,30 +94,45 @@ export default {
       },
     };
   },
-  methods: {
-    data() {
-      this.$router.push("/data");
+  created(){
+    this.getUserId()
+  },
+   methods:{
+    getUserId(){
+      this.userId = this.$route.params.userId
     },
-    home() {
-      this.$router.push("/home");
+    data(){
+       this.$router.push({
+          name: "Data", 
+          params: { userId: this.userId },
+        });
     },
-    user() {
-      window.location.reload();
+    home(){
+       this.$router.push({
+          name: "Home", 
+          params: { userId: this.userId },
+        });
     },
-    about() {
-      this.$router.push("/about");
+    user(){
+      window.location.reload()
     },
-    classManage() {
-      this.$router.push("/class");
+    about(){
+      this.$router.push({
+          name: "About", 
+          params: { userId: this.userId },
+        });
     },
-    /*username:"",
-      password:"",
-      newpassword:""*/
+    classManage(){
+      this.$router.push({
+          name: "Class", 
+          params: { userId: this.userId },
+        });
+    },
     async submit(form, done) {
-      this.$message.success(JSON.stringify(form));
+      //this.$message.success(JSON.stringify(form));
       this.pwdcommit.username = this.obj.username;
       this.pwdcommit.password = this.obj.password;
-      this.pwdcommit.newpassword = this.obj.newpassword;
+      this.pwdcommit.newPassword = this.obj.newPassword;
       console.log(this.pwdcommit);
       const { data: res } = await this.$http.post(
         "updatePassword",

@@ -25,57 +25,57 @@ const routes = [
     component:()=>import('../views/Login.vue')
   },
   {
-    path: '/home',
+    path: '/home/:userId',
     name: 'Home',
     component: Home
   },
   {
-    path: '/data',
+    path: '/data/:userId',
     name: 'Data',
     component: Data
   },
   {
-    path: '/user',
+    path: '/user/:userId',
     name: 'User',
     component: User
   },
   {
-    path: '/about',
+    path: '/about/:userId',
     name: 'About',
     component: About
   },
   {
-    path: '/yearMajorClass',
+    path: '/yearMajorClass/:userId',
     name: 'yearMajorClass',
     component: yearMajorClass
   },
   {
-    path: '/Class',
+    path: '/Class/:userId',
     name: 'Class',
     component: Class
   },
   {
-    path: '/graduateDemands',
+    path: '/graduateDemands/:userId',
     name: 'graduateDemands',
     component: graduateDemands
   },
   {
-    path: '/point',
+    path: '/point/:userId',
     name: 'point',
     component: point
   },
   {
-    path: '/trainingPlan',
+    path: '/trainingPlan/:userId',
     name: 'trainingPlan',
     component: trainingPlan
   },
   {
-    path: '/assign',
+    path: '/assign/:userId',
     name: 'assign',
     component: assign
   },
   {
-    path: '/supportEstate',
+    path: '/supportEstate/:userId',
     name: 'supportEstate',
     component: supportEstate
   },
@@ -91,6 +91,17 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+
+//挂载一个路由导航守卫
+router.beforeEach((to, from, next) => {
+  if(to.path == '/login') return next()
+  //先获取token
+  const tokenStr = window.sessionStorage.getItem('token')
+  //没有token跳转到登录页
+  if(!tokenStr) return next('/login')
+  //有token放行，token真假以及时效性放在后端验证了
+  next()
 })
 
 export default router
