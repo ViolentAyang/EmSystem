@@ -23,6 +23,29 @@
     <el-alert title="设置指标点" type="success" :closable="false">
     </el-alert>
     <div style="float: left; display: flex">
+     <el-select
+        style="
+          width: 140px;
+          margin-right: 10px;
+          margin-top: 10px;
+          margin-left: 10px;
+        "
+        v-model="yearFilter"
+        placeholder="选择年级查询"
+      >
+        <el-option
+          v-for="item in yearOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        >
+        </el-option>
+      </el-select>
+      <el-input
+        style="width: 180px; margin-right: 10px; margin-top: 10px"
+        v-model="majorFilter"
+        placeholder="请输入专业名"
+      ></el-input>
         <el-input
         style="width: 180px; margin-left: 10px;margin-right: 10px;  margin-top: 10px"
         v-model="majorFilter"
@@ -94,6 +117,10 @@
       border
       style="width: 100%"
     >
+    <el-table-column header-align="center" prop="gradeId" label="年级">
+      </el-table-column>
+      <el-table-column header-align="center" prop="majorName" label="专业">
+      </el-table-column>
       <el-table-column header-align="center" prop="yearTable" label="毕业要求编号">
       </el-table-column>
       <el-table-column header-align="center" prop="majorTable" label="指标点编号">
@@ -139,12 +166,12 @@ export default {
         ],
       },
       tableData: [
-        { yearTable: "10", majorTable: "01", classTable: "45" },
-        { yearTable: "10", majorTable: "02", classTable: "85232" },
-        { yearTable: "10", majorTable: "01", classTable: "8561" },
-        { yearTable: "10", majorTable: "02", classTable: "454" },
-        { yearTable: "10", majorTable: "01", classTable: "856896" },
-        { yearTable: "20", majorTable: "02", classTable: "8686" },
+        { gradeId: "2020",majorName:"软件工程",yearTable: "10", majorTable: "01", classTable: "45" },
+        { gradeId: "2020",majorName:"软件工程",yearTable: "10", majorTable: "02", classTable: "85232" },
+        { gradeId: "2020",majorName:"软件工程",yearTable: "10", majorTable: "01", classTable: "8561" },
+        { gradeId: "2020",majorName:"软件工程",yearTable: "10", majorTable: "02", classTable: "454" },
+        { gradeId: "2020",majorName:"软件工程",yearTable: "10", majorTable: "01", classTable: "856896" },
+        { gradeId: "2020",majorName:"软件工程",yearTable: "20", majorTable: "02", classTable: "8686" },
       ],
       classOptions: [
         { id: "600", name: "1班" },
