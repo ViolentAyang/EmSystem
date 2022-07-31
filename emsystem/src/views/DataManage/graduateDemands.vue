@@ -296,6 +296,7 @@ export default {
       EditDialogVisible: false, //修改毕业要求对话框
       gradeSearch: {
         //查询年级对应的专业
+        userId: "",
         gradeId: "",
       },
       //新增对话框绑定的
@@ -306,6 +307,7 @@ export default {
       },
       //前端新增发送的请求
       addNewReq: {
+        userId: "",
         gradeSearch: "",
         majorSearch: "",
         contentSearch: "",
@@ -316,6 +318,7 @@ export default {
         graText: "",
       },
       editForm: {
+        userId: "",
         uid: "",
         gradeSearch: "",
         majorSearch: "",
@@ -334,6 +337,7 @@ export default {
       ],
       majorOptions: [],
       searchAll: {
+        userId: "",
         gradeSearch: "",
         majorSearch: "",
         noSearch: "",
@@ -341,6 +345,7 @@ export default {
       },
       //删除数组
       deleteArray: {
+        userId: "",
         reqArray: [],
       },
       Alldata:[],
@@ -376,6 +381,7 @@ export default {
     },
     getUserId() {
       this.userId = this.$route.params.userId;
+      this.searchAll.userId = this.userId
     },
     data() {
       this.$router.push({
@@ -420,6 +426,8 @@ export default {
       if (res.meta.status != "200") return this.$message.error("获取失败！");
       this.$message.success("获取成功！");
       this.tableData = res.data.tableData;
+      this.Alldata = this.tableData;
+      this.getSpanArr(this.Alldata);
       this.resetSearch();
     },
     //重置大表格搜索
@@ -431,6 +439,7 @@ export default {
     },
     //根据年级获取对应的专业
     async getCorrespondingMajor() {
+      this.gradeSearch.userId = this.userId
       this.gradeSearch.gradeId = this.addValidateForm.yearValue;
       const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
       //console.log("测试查询专业");
@@ -441,7 +450,8 @@ export default {
       this.$message.success("查询成功！");
     },
     async getCorrespondingMajorEdit() {
-      this.gradeSearch.gradeId = this.yearValue;
+      this.gradeSearch.userId = this.userId
+      this.gradeSearch.gradeId = this.editValidateForm.yearValue;
       const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
       //console.log("测试查询专业");
       //console.log(res.data.majorData);
@@ -452,6 +462,7 @@ export default {
     },
     //新增毕业要求
     async submitForm() {
+      this.addNewReq.userId = this.userId;
       this.addNewReq.gradeSearch = this.addValidateForm.yearValue;
       this.addNewReq.majorSearch = this.addValidateForm.majorValue;
       this.addNewReq.contentSearch = this.addValidateForm.graText;
@@ -464,6 +475,7 @@ export default {
       this.$message.success("新增成功！");
       this.getList();
       this.resetFormAdd();
+      this.handleClose();
     },
     resetFormAdd() {
       (this.addValidateForm.yearValue = ""),
@@ -477,6 +489,7 @@ export default {
     },
     async handleDelete(row) {
       console.log(row.uid);
+      this.deleteArray.userId = this.userId
       this.deleteArray.reqArray.push(row.uid);
       console.log(this.deleteArray)
       const { data: res } = await this.$http.post(
@@ -495,6 +508,7 @@ export default {
       this.requireDialogVisible = false;
     },
     async submitFormEdit(){
+      this.editForm.userId = this.userId;
       this.editForm.gradeSearch = this.editValidateForm.yearValue;
       this.editForm.majorSearch = this.editValidateForm.majorValue;
       this.editForm.contentSearch = this.editValidateForm.graText;
