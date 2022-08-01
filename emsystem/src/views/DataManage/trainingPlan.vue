@@ -20,8 +20,43 @@
         >
       </div>
     </div>
-    <el-alert title="设置培养计划" type="success" :closable="false">
-    </el-alert>
+    <el-alert title="设置培养计划" type="success" :closable="false"> </el-alert>
+    <div style="float: left; display: flex">
+      <el-input
+        style="
+          width: 180px;
+          margin-left: 10px;
+          margin-right: 10px;
+          margin-top: 10px;
+        "
+        v-model="InitSearch.courseNo"
+        placeholder="请输入课程编号"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-right: 10px; margin-top: 10px"
+        v-model="InitSearch.courseName"
+        placeholder="请输入课程名"
+      ></el-input>
+      <el-input
+        style="width: 180px; margin-top: 10px; margin-right: 10px"
+        v-model="InitSearch.arrangeTerm"
+        placeholder="请输入开设学期"
+      ></el-input>
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="tableFilter"
+        type="primary"
+        icon="el-icon-search"
+        >搜索</el-button
+      >
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="filterReset"
+        type="primary"
+        icon="el-icon-refresh"
+        >重置</el-button
+      >
+    </div>
     <el-button
       style="
         margin-right: 30px;
@@ -29,121 +64,98 @@
         margin-bottom: 10px;
         float: right;
       "
-      @click="setClass"
+      @click="newPlan"
       type="success"
       >新增培养计划</el-button
     >
-  
-
-    <!--设置班级对话框-->
+    <!--新增培养计划对话框-->
     <el-dialog
-      title="设置班级"
-      :visible.sync="classDialogVisible"
+      title="新增培养计划"
+      :visible.sync="dialogVisibleAdd"
       width="40%"
-      :before-close="handleClose"
+      :before-close="handleCloseAdd"
     >
-      <el-form
-        :inline="true"
-        :model="dynamicValidateForm"
-        ref="dynamicValidateForm"
-        label-width="100px"
-        class="demo-dynamic"
-      >
-        <el-alert
-          style="margin-bottom: 5px"
-          title="选择年级后进行搜索可以获得该年级对应所有的专业"
-          type="warning"
+      <el-form ref="form" :model="addForm" label-width="80px">
+      <el-form-item label="课程编号">
+        <el-input v-model="addForm.courseNo"></el-input>
+      </el-form-item>
+      <el-form-item label="课程名">
+        <el-input v-model="addForm.courseName"></el-input>
+      </el-form-item>
+      <el-form-item label="课时数">
+        <el-input v-model="addForm.creditHour"></el-input>
+      </el-form-item>
+      <el-form-item label="开设学期">
+        <el-input v-model="addForm.arrangeTerm"></el-input>
+      </el-form-item>
+    </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCloseAdd">取 消</el-button>
+        <el-button type="danger" @click="resetAddForm"
+          >重置</el-button
         >
-        </el-alert>
-        <el-form-item
-          label="请选择年级"
-          :rules="{
-            required: true,
-            message: '必须先选年级',
-            trigger: 'blur',
-          }"
+        <el-button type="primary" @click="submitAdd"
+          >提交</el-button
         >
-          <el-select v-model="yearValue" placeholder="请选择">
-            <el-option
-              v-for="item in yearOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            >
-            </el-option>
-          </el-select>
-
-          <el-button
-            style="margin-left: 10px"
-            icon="el-icon-search"
-            circle
-          ></el-button>
-        </el-form-item>
-        <el-form-item
-          label="请选择专业"
-          :rules="{
-            required: true,
-            message: '必须先选专业',
-            trigger: 'blur',
-          }"
-        >
-          <el-select v-model="majorValue" placeholder="请选择">
-            <el-option
-              v-for="item in majorOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          v-for="(domain, index) in dynamicValidateForm.domains"
-          :label="'专业' + index"
-          :key="domain.key"
-          :prop="'domains.' + index + '.value'"
-          :rules="{
-            required: true,
-            message: '专业不能为空',
-            trigger: 'blur',
-          }"
-        >
-          <el-input size="small" v-model="domain.value"></el-input
-          ><el-button @click.prevent="removeDomain(domain)">删除</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm('dynamicValidateForm')"
-            >提交</el-button
-          >
-          <el-button @click="addDomain">新增专业</el-button>
-          <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
-          <el-button type="danger" @click="yearDialogVisible = false"
-            >取 消</el-button
-          >
-        </el-form-item>
-      </el-form>
+      </span>
     </el-dialog>
-
-    <!--显示用户下所有的班级年级专业-->
+    <!--修改培养计划对话框-->
+    <el-dialog
+      title="新增培养计划"
+      :visible.sync="dialogVisibleEdit"
+      width="40%"
+      :before-close="handleCloseEdit"
+    >
+      <el-form ref="form" :model="editForm" label-width="80px">
+      <el-form-item label="课程编号">
+        <el-input v-model="editForm.courseNo"></el-input>
+      </el-form-item>
+      <el-form-item label="课程名">
+        <el-input v-model="editForm.courseName"></el-input>
+      </el-form-item>
+      <el-form-item label="课时数">
+        <el-input v-model="editForm.creditHour"></el-input>
+      </el-form-item>
+      <el-form-item label="开设学期">
+        <el-input v-model="editForm.arrangeTerm"></el-input>
+      </el-form-item>
+    </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCloseEdit">取 消</el-button>
+        <el-button type="danger" @click="resetEditForm"
+          >重置</el-button
+        >
+        <el-button type="primary" @click="submitEdit"
+          >提交</el-button
+        >
+      </span>
+    </el-dialog>
+    <!--显示用户下所有的培养计划-->
     <el-table
       :cell-style="{ textAlign: 'center' }"
       :data="tableData"
       border
       style="width: 100%"
     >
-      <el-table-column header-align="center" prop="yearTable" label="课程编号">
+      <el-table-column header-align="center" prop="courseNo" label="课程编号">
       </el-table-column>
-      <el-table-column header-align="center" prop="majorTable" label="课程名">
+      <el-table-column header-align="center" prop="courseName" label="课程名">
       </el-table-column>
-      <el-table-column header-align="center" prop="classTable" label="学时">
+      <el-table-column header-align="center" prop="creditHour" label="学时">
+      </el-table-column
+      ><el-table-column
+        header-align="center"
+        prop="arrangeTerm"
+        label="开设学期"
+      >
       </el-table-column>
       <el-table-column header-align="center" label="操作">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
             >删除</el-button
+          >
+          <el-button size="mini" type="primary" @click="openEdit(scope.row)"
+            >修改</el-button
           >
         </template>
       </el-table-column>
@@ -155,71 +167,68 @@
 export default {
   data() {
     return {
-      userId: '',
-      yearValue: "", //设置专业时 选择年级下拉框的绑定值
-      majorValue: "", //设置班级时 选择专业下拉框的绑定值
-      yearDialogVisible: false, //设置年级对话框
-      majorDialogVisible: false, //设置专业对话框
-      classDialogVisible: false, //设置班级对话框
-      dynamicValidateForm: {
-        //动态表单增减
-        domains: [
-          {
-            value: "",
-          },
-        ],
-      },
+      userId: "",
+      dialogVisibleAdd: false,
+      dialogVisibleEdit: false,
       tableData: [
-        { yearTable: "10", majorTable: "01", classTable: "45" },
-        { yearTable: "10", majorTable: "02", classTable: "85232" },
-        { yearTable: "10", majorTable: "01", classTable: "8561" },
-        { yearTable: "10", majorTable: "02", classTable: "454" },
-        { yearTable: "10", majorTable: "01", classTable: "856896" },
-        { yearTable: "20", majorTable: "02", classTable: "8686" },
+        {
+          courseNo: "0809212052",
+          courseName: "算法和数据结构",
+          creditHour: "64",
+          arrangeTerm: "3",
+        },
       ],
-      classOptions: [
-        { id: "600", name: "1班" },
-        { id: "601", name: "2班" },
-        { id: "602", name: "3班" },
-        { id: "603", name: "4班" },
-        { id: "604", name: "5班" },
-        { id: "605", name: "6班" },
-      ],
-      yearOptions: [
-        { id: "2019", name: "2019级学生" },
-        { id: "2020", name: "2020级学生" },
-        { id: "2021", name: "2021级学生" },
-        { id: "2022", name: "2022级学生" },
-        { id: "2023", name: "2023级学生" },
-      ],
-      majorOptions: [
-        { value: "01", label: "会计学" },
-        { value: "02", label: "财务管理" },
-        { value: "03", label: "审计学" },
-        { value: "04", label: "金融学" },
-        { value: "05", label: "金融工程" },
-        { value: "06", label: "市场营销" },
-        { value: "07", label: "物流管理" },
-        { value: "08", label: "国际经济与贸易" },
-        { value: "09", label: "电子商务" },
-      ],
+      InitSearch: {
+        userId: "",
+        courseNo: "",
+        courseName: "",
+        arrangeTerm: "",
+      },
+      addForm:{
+        userId: "",
+        courseNo: "",
+        courseName: "",
+        creditHour: "",
+        arrangeTerm: "",
+      },
+      editForm:{
+        userId: "",
+        courseNo: "",
+        courseName: "",
+        creditHour: "",
+        arrangeTerm: "",
+      },
+      deleteObject:{
+        userId: "",
+        courseArray: []
+      }
     };
   },
   created() {
     this.getUserId();
   },
   methods: {
-    setYear() {
-      this.yearDialogVisible = !this.yearDialogVisible;
+    async getList() {
+      const { data: res } = await this.$http.post(
+        "getAllPlan",
+        this.InitSearch
+      );
+      if (res.meta.status != "200") return this.$message.error("获取失败！");
+      this.$message.success("获取成功！");
+      this.tableData = res.data;
     },
-    setMajor() {
-      this.majorDialogVisible = !this.majorDialogVisible;
+    async tableFilter() {
+      const { data: res } = await this.$http.post(
+        "getAllPlan",
+        this.InitSearch
+      );
+      if (res.meta.status != "200") return this.$message.error("搜索失败！");
+      this.$message.success("搜索成功！");
+      this.tableData = res.data;
     },
-    setClass() {
-      this.classDialogVisible = !this.classDialogVisible;
-    },
-   getUserId() {
+    getUserId() {
       this.userId = this.$route.params.userId;
+      this.InitSearch.userId = this.userId;
     },
     data() {
       this.$router.push({
@@ -251,42 +260,74 @@ export default {
         params: { userId: this.userId },
       });
     },
-
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+    filterReset() {
+      this.InitSearch.majorNo = "";
+      this.InitSearch.majorName = "";
+      this.InitSearch.arrangeTerm = "";
+      this.getList();
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    //新增用到的函数
+    handleCloseAdd(){
+      this.dialogVisibleAdd = false
+      this.resetAddForm()
     },
-    removeDomain(item) {
-      var index = this.dynamicValidateForm.domains.indexOf(item);
-      if (index !== -1) {
-        this.dynamicValidateForm.domains.splice(index, 1);
-      }
+    resetAddForm(){
+      this.addForm.courseNo = ""
+      this.addForm.courseName = ""
+      this.addForm.creditHour = ""
+      this.addForm.arrangeTerm = ""
     },
-    addDomain() {
-      this.dynamicValidateForm.domains.push({
-        value: "",
-        key: Date.now(),
-      });
+    newPlan(){
+      this.dialogVisibleAdd = true
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    async submitAdd(){
+      this.addForm.userId = this.userId;
+      const { data: res } = await this.$http.post(
+        "addPlan",
+        this.addForm
+      );
+      if (res.meta.status != "200") return this.$message.error("新增失败！");
+      this.$message.success("新增成功！");
+      this.getList()
     },
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    //修改培养计划
+    handleCloseEdit(){
+      this.dialogVisibleEdit = false
     },
+    openEdit(row){
+      this.dialogVisibleEdit = true
+      this.editForm.courseNo = row.courseNo
+      this.editForm.courseName = row.courseName
+      this.editForm.creditHour = row.creditHour
+      this.editForm.arrangeTerm = row.arrangeTerm
+    },
+    resetEditForm(){
+      this.editForm.courseNo = ""
+      this.editForm.courseName = ""
+      this.editForm.creditHour = ""
+      this.editForm.arrangeTerm = ""
+    },
+    async submitEdit(){
+      this.editForm.userId = this.userId
+       const { data: res } = await this.$http.post(
+        "editPlan",
+        this.editForm
+      );
+      if (res.meta.status != "200") return this.$message.error("修改失败！");
+      this.$message.success("修改成功！");
+      this.tableData = res.data;
+    },
+    async handleDelete(row){
+      this.deleteObject.courseArray.push(row.courseNo)
+      this.deleteObject.userId = this.userId
+      const { data: res } = await this.$http.post(
+        "deletePlan",
+        this.deleteObject
+      );
+      if (res.meta.status != "200") return this.$message.error("修改失败！");
+      this.$message.success("修改成功！");
+      this.tableData = res.data;
+    }
   },
 };
 </script>

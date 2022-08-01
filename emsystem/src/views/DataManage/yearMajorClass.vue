@@ -283,22 +283,26 @@ export default {
       classDialogVisible: false, //设置班级对话框
       gradeSearch: {
         //用于查询年级对应的专业
+        userId : "",
         gradeId: "",
       },
       allTableData: [],
       MajorSubmit: {
         //设置专业提交的数据
+        userId: "",
         gradeId: "",
         majorArray: [],
       },
       ClassSubmit: {
         //设置班级提交的数据
+        userId:"",
         gradeId: "",
         majorId: "",
         classArray: [],
       },
       //过滤 如果全部为空 则返回所有数据
       InitSearch: {
+        userId: "",
         gradeSearch: "",
         majorSearch: "",
         classSearch: "",
@@ -320,6 +324,7 @@ export default {
         ],
       },
       singleDeleteArray: {
+        userId: "",
         classArray: [],
       },
       yearOptions: [
@@ -375,6 +380,7 @@ export default {
     },
    getUserId() {
       this.userId = this.$route.params.userId;
+      this.InitSearch.userId = this.userId;
     },
     dataClick() {
       this.$router.push({
@@ -414,6 +420,7 @@ export default {
           //this.MajorSubmit.gradeId = this.MajordynamicValidateForm[0]
           console.log(this.MajordynamicValidateForm);
           this.MajorSubmit.gradeId = this.yearValue;
+          this.MajorSubmit.userId = this.userId;
           for (
             let i = 0;
             i < this.MajordynamicValidateForm.domains.length;
@@ -462,6 +469,7 @@ export default {
     },
     async handleDelete(row) {
       console.log(row);
+      this.singleDeleteArray.userId = this.userId;
       this.singleDeleteArray.classArray.push(row.classId);
       console.log("测试单选删除数组");
       console.log(this.singleDeleteArray);
@@ -488,6 +496,7 @@ export default {
         if (valid) {
           //this.ClassSubmit.gradeId = this.ClassdynamicValidateForm[0]
           console.log(this.ClassdynamicValidateForm);
+          this.ClassSubmit.userId = this.userId;
           this.ClassSubmit.gradeId = this.yearValue;
           this.ClassSubmit.majorId = this.majorValue;
           for (
@@ -502,6 +511,7 @@ export default {
           }
           console.log("测试提交的数据");
           console.log(this.ClassSubmit);
+          this.gradeSearch.userId = this.userId;
           this.gradeSearch.gradeId = this.yearValue;
           if (this.majorValue == "") return this.$message.error("请选择专业！");
           const { data: res } = await this.$http.post(
@@ -546,6 +556,7 @@ export default {
     },
     //获取年级对应的专业
     async getCorrespondingMajor() {
+      this.gradeSearch.userId = this.userId;
       this.gradeSearch.gradeId = this.yearValue;
       const { data: res } = await this.$http.post("getMajor", this.gradeSearch);
       console.log("测试查询专业");
