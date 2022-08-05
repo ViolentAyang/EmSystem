@@ -170,14 +170,7 @@ export default {
       userId: "",
       dialogVisibleAdd: false,
       dialogVisibleEdit: false,
-      tableData: [
-        {
-          courseNo: "0809212052",
-          courseName: "算法和数据结构",
-          creditHour: "64",
-          arrangeTerm: "3",
-        },
-      ],
+      tableData: [],
       InitSearch: {
         userId: "",
         courseNo: "",
@@ -206,6 +199,7 @@ export default {
   },
   created() {
     this.getUserId();
+    this.getList()
   },
   methods: {
     async getList() {
@@ -215,7 +209,7 @@ export default {
       );
       if (res.meta.status != "200") return this.$message.error("获取失败！");
       this.$message.success("获取成功！");
-      this.tableData = res.data;
+      this.tableData = res.data.planData;
     },
     async tableFilter() {
       const { data: res } = await this.$http.post(
@@ -224,7 +218,7 @@ export default {
       );
       if (res.meta.status != "200") return this.$message.error("搜索失败！");
       this.$message.success("搜索成功！");
-      this.tableData = res.data;
+      this.tableData = res.data.planData;
     },
     getUserId() {
       this.userId = this.$route.params.userId;
@@ -289,6 +283,7 @@ export default {
       if (res.meta.status != "200") return this.$message.error("新增失败！");
       this.$message.success("新增成功！");
       this.getList()
+      this.handleCloseAdd()
     },
     //修改培养计划
     handleCloseEdit(){
@@ -315,7 +310,8 @@ export default {
       );
       if (res.meta.status != "200") return this.$message.error("修改失败！");
       this.$message.success("修改成功！");
-      this.tableData = res.data;
+      this.getList();
+      this.handleCloseEdit()
     },
     async handleDelete(row){
       this.deleteObject.courseArray.push(row.courseNo)
@@ -324,9 +320,9 @@ export default {
         "deletePlan",
         this.deleteObject
       );
-      if (res.meta.status != "200") return this.$message.error("修改失败！");
-      this.$message.success("修改成功！");
-      this.tableData = res.data;
+      if (res.meta.status != "200") return this.$message.error("删除失败！");
+      this.$message.success("删除成功！");
+      this.getList()
     }
   },
 };

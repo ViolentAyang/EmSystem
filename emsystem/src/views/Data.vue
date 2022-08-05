@@ -103,7 +103,7 @@ export default {
               });
             },
             count: "分配指标点",
-            title: "给指标点分配课程和支撑等级",
+            title: "给课程分配指标点和支撑等级",
             icon: "el-icon-location-outline",
             color: "#363636",
           },
