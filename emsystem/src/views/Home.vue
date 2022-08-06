@@ -1,19 +1,30 @@
 <template>
-  <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
-        <el-button @click="classManage" type="success" plain>班级管理</el-button>
+        <el-button @click="classManage" type="success" plain
+          >班级管理</el-button
+        >
+        <el-button @click="teacherManager" type="primary" plain>教师管理</el-button>
         <el-button @click="user" type="info" plain>个人信息</el-button>
-        <el-button @click="about" style="margin-right: 10px" type="primary" plain
+        <el-button
+          @click="about"
+          type="primary"
+          plain
           >关于我们</el-button
         >
-      </el-row>
-    </div>
+        <el-button
+          @click="logout"
+          style="margin-right: 10px;margin-bottom:5px"
+          type="danger"
+          plain
+          >退出登录</el-button
+        >
+      </div>
     <img src="../assets/home.jpg" alt="">
   </div>
 </template>
@@ -60,21 +71,31 @@ export default {
           name: "Class", 
           params: { userId: this.userId },
         });
-    }
+    },
+    logout(){
+      window.sessionStorage.clear();
+      this.$router.push("/login");
+    },
+    teacherManager(){
+      this.$router.push({
+        name: "teacherManager",
+        params: { userId: this.userId },
+      });
+    },
   }
 };
 </script>
 
 <style lang="less" scoped>
 #guide {
-  height: 60px;
+  height: 100%;
   background-color: #f5f5f8;
   color: #333;
   text-align: center;
   line-height: 40px;
 }
 &img{
-    height: 690px;
-    width: 1536px;
+    height: 60%;
+    width: 100%;
 }
 </style>

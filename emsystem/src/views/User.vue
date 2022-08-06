@@ -1,24 +1,26 @@
 <template>
   <div>
     <div id="guide">
-      <el-row style="margin-top: 10px; float: right">
+      <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
-        <el-button @click="home" style="margin-left: 720px" type="danger" plain>
-          首页
-        </el-button>
+      </div>
+      <div style="margin-top: 10px; float: right">
+        <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
         >
+        <el-button @click="teacherManager" type="primary" plain>教师管理</el-button>
         <el-button @click="user" type="info" plain>个人信息</el-button>
+        <el-button @click="about" type="primary" plain>关于我们</el-button>
         <el-button
-          @click="about"
-          style="margin-right: 10px"
-          type="primary"
+          @click="logout"
+          style="margin-right: 10px; margin-bottom: 5px"
+          type="danger"
           plain
-          >关于我们</el-button
+          >退出登录</el-button
         >
-      </el-row>
+      </div>
     </div>
     <el-card class="box-card">
       <avue-form
@@ -52,7 +54,7 @@ export default {
       }
     };
     return {
-      userId: '',
+      userId: "",
       pwdcommit: {
         username: "",
         password: "",
@@ -94,39 +96,49 @@ export default {
       },
     };
   },
-  created(){
-    this.getUserId()
+  created() {
+    this.getUserId();
   },
-   methods:{
-    getUserId(){
-      this.userId = this.$route.params.userId
+  methods: {
+    getUserId() {
+      this.userId = this.$route.params.userId;
     },
-    data(){
-       this.$router.push({
-          name: "Data", 
-          params: { userId: this.userId },
-        });
+    logout(){
+      window.sessionStorage.clear();
+      this.$router.push("/login");
     },
-    home(){
-       this.$router.push({
-          name: "Home", 
-          params: { userId: this.userId },
-        });
-    },
-    user(){
-      window.location.reload()
-    },
-    about(){
+    data() {
       this.$router.push({
-          name: "About", 
-          params: { userId: this.userId },
-        });
+        name: "Data",
+        params: { userId: this.userId },
+      });
     },
-    classManage(){
+    home() {
       this.$router.push({
-          name: "Class", 
-          params: { userId: this.userId },
-        });
+        name: "Home",
+        params: { userId: this.userId },
+      });
+    },
+    user() {
+      window.location.reload();
+    },
+    teacherManager(){
+      this.$router.push({
+        name: "teacherManager",
+        params: { userId: this.userId },
+      });
+    },
+    about() {
+      this.$router.push({
+        name: "About",
+        params: { userId: this.userId },
+      });
+    },
+    classManage() {
+      this.$router.push({
+        name: "Class",
+        params: { userId: this.userId },
+      });
     },
     async submit(form, done) {
       //this.$message.success(JSON.stringify(form));

@@ -4,13 +4,17 @@ import Home from '../views/Home.vue'
 import Data from '../views/Data.vue'
 import User from '../views/User.vue'
 import About from '../views/About.vue'
-import Class from '../views/Class.vue'
+import Class from '../views/SummaryResults/ScoreRecords.vue' //专业负责人查看成绩录入情况
 import graduateDemands from '../views/DataManage/graduateDemands.vue'
 import yearMajorClass from '../views/DataManage/yearMajorClass.vue'
 import point from '../views/DataManage/point.vue'
 import trainingPlan from '../views/DataManage/trainingPlan.vue'
 import assign from '../views/DataManage/assign.vue'
 import supportEstate from '../views/DataManage/supportEstate.vue'
+import uploadScore from '../views/teacher/uploadScore.vue'
+import teacherManager from '../views/teacherManager/teacherManager.vue'
+import courseList from '../views/teacher/courseList.vue'
+
 
 Vue.use(VueRouter)
 
@@ -79,14 +83,21 @@ const routes = [
     name: 'supportEstate',
     component: supportEstate
   },
-  //{
-    //path: '/about',
-    //name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    //component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  //}
+  {
+    path: '/uploadScore/:userId',
+    name: 'uploadScore',
+    component: uploadScore
+  },
+  {
+    path: '/teacherManager/:userId',
+    name: 'teacherManager',
+    component: teacherManager
+  },
+  {
+    path: '/courseList/:userId',
+    name: 'courseList',
+    component: courseList
+  },
 ]
 
 const router = new VueRouter({

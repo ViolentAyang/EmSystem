@@ -34,7 +34,10 @@
         </div>
       </div>
       <div class="butt">
-        <el-button type="primary" @click="login">登录</el-button>
+        <el-button type="primary" plain @click="login">负责人登录</el-button>
+        <el-button type="warning" plain @click="teacherLogin"
+          >教师登录</el-button
+        >
         <el-button class="shou" @click="register">注册</el-button>
       </div>
 
@@ -138,9 +141,20 @@ export default {
         //console.log(res.data.userId);
         window.sessionStorage.setItem("token", res.data.token);
         this.$router.push({
-          name: "Home", 
+          name: "Home",
           params: { userId: this.userId },
         });
+      });
+    },
+    async teacherLogin() {
+      /*const { data: res } = await this.$http.post("login", this.form);
+      if (res.meta.status != "200") return this.$message.error("登录失败！");
+      this.$message.success("登录成功！");
+      this.userId = res.data.userId;
+      window.sessionStorage.setItem("token", res.data.token);*/
+      this.$router.push({
+        name: "courseList",
+        params: { userId: this.userId },
       });
     },
     remenber(data) {

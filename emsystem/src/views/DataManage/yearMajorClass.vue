@@ -10,13 +10,20 @@
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
         >
+        <el-button @click="teacherManager" type="primary" plain>教师管理</el-button>
         <el-button @click="user" type="info" plain>个人信息</el-button>
         <el-button
           @click="about"
-          style="margin-right: 10px"
           type="primary"
           plain
           >关于我们</el-button
+        >
+        <el-button
+          @click="logout"
+          style="margin-right: 10px;margin-bottom:5px"
+          type="danger"
+          plain
+          >退出登录</el-button
         >
       </div>
     </div>
@@ -368,6 +375,16 @@ export default {
       console.log(res.data.tableData);
       console.log("测试初始化数据");
       console.log(res);
+    },
+    logout(){
+      window.sessionStorage.clear();
+      this.$router.push("/login");
+    },
+    teacherManager(){
+      this.$router.push({
+        name: "teacherManager",
+        params: { userId: this.userId },
+      });
     },
     setYear() {
       this.yearDialogVisible = !this.yearDialogVisible;

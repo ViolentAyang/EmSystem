@@ -1,6 +1,6 @@
 <template>
   <div>
-       <div id="guide">
+    <div id="guide">
       <div style="margin-top: 10px; margin-left: 20px; float: left">
         工程认证达成度定型化管理系统
       </div>
@@ -10,13 +10,15 @@
         <el-button @click="classManage" type="success" plain
           >班级管理</el-button
         >
+        <el-button @click="teacherManager" type="primary" plain>教师管理</el-button>
         <el-button @click="user" type="info" plain>个人信息</el-button>
+        <el-button @click="about" type="primary" plain>关于我们</el-button>
         <el-button
-          @click="about"
-          style="margin-right: 10px"
-          type="primary"
+          @click="logout"
+          style="margin-right: 10px; margin-bottom: 5px"
+          type="danger"
           plain
-          >关于我们</el-button
+          >退出登录</el-button
         >
       </div>
     </div>
@@ -40,7 +42,7 @@
 export default {
   data() {
     return {
-      userId: '',
+      userId: "",
       list: [],
       option: {
         column: [
@@ -60,16 +62,26 @@ export default {
       },
     };
   },
- created() {
+  created() {
     this.getUserId();
   },
   methods: {
     getUserId() {
       this.userId = this.$route.params.userId;
     },
+    logout(){
+      window.sessionStorage.clear();
+      this.$router.push("/login");
+    },
     data() {
       this.$router.push({
         name: "Data",
+        params: { userId: this.userId },
+      });
+    },
+    teacherManager(){
+      this.$router.push({
+        name: "teacherManager",
         params: { userId: this.userId },
       });
     },
