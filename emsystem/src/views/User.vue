@@ -8,7 +8,7 @@
         <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
-          >班级管理</el-button
+          >专业达成度</el-button
         >
         <el-button @click="teacherManager" type="primary" plain>教师管理</el-button>
         <el-button @click="user" type="info" plain>个人信息</el-button>

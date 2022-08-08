@@ -8,7 +8,7 @@
         <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
-          >班级管理</el-button
+          >专业达成度</el-button
         >
         <el-button @click="teacherManager" type="primary" plain
           >教师管理</el-button
@@ -56,6 +56,7 @@
         >重置</el-button
       >
     </div>
+
     <el-button
       style="
         margin-right: 30px;
@@ -67,7 +68,17 @@
       type="success"
       >新增教师账号</el-button
     >
-
+    <el-button
+      style="
+        margin-right: 30px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        float: right;
+      "
+      @click="manageTeacher"
+      type="success"
+      >管理教师所教授课程</el-button
+    >
     <!--新增培养计划对话框-->
     <el-dialog
       title="新增教师账号"
@@ -206,7 +217,7 @@ export default {
       );
       if (res.meta.status != "200") return this.$message.error("获取失败！");
       this.$message.success("获取成功！");
-      this.Alldata = res.data
+      this.Alldata = res.data;
     },
     getUserId() {
       this.userId = this.$route.params.userId;
@@ -218,10 +229,7 @@ export default {
       this.$router.push("/login");
     },
     teacherManager() {
-      this.$router.push({
-        name: "teacherManager",
-        params: { userId: this.userId },
-      });
+      window.location.reload()
     },
     data() {
       this.$router.push({
@@ -254,11 +262,11 @@ export default {
       });
     },
     async userStateChanged(row) {
-        this.editStatusForm.userId = this.userId;
-        this.editStatusForm.teacherNo = row.teacherNo;
-        this.editStatusForm.status = row.status;
-        //console.log(this.editStatusForm)
-        const { data: res } = await this.$http.post(
+      this.editStatusForm.userId = this.userId;
+      this.editStatusForm.teacherNo = row.teacherNo;
+      this.editStatusForm.status = row.status;
+      //console.log(this.editStatusForm)
+      const { data: res } = await this.$http.post(
         "editStatus",
         this.editStatusForm
       );
@@ -298,7 +306,7 @@ export default {
       );
       if (res.meta.status != "200") return this.$message.error("查询失败！");
       this.$message.success("查询成功！");
-      this.Alldata = res.data
+      this.Alldata = res.data;
     },
     filterReset() {
       this.InitSearch.teacherName = "";
@@ -342,7 +350,12 @@ export default {
       this.getList();
       this.handleCloseEdit();
     },
-
+    manageTeacher(){
+      this.$router.push({
+        name: "assignCourse",
+        params: { userId: this.userId },
+      });
+    }
   },
 };
 </script>

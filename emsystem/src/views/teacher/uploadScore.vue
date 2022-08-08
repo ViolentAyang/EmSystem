@@ -5,13 +5,9 @@
         工程认证达成度定型化管理系统
       </div>
       <div style="margin-top: 10px; float: right">
-        <el-button @click="home" type="danger" plain> 首页 </el-button>
-        <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
-          >班级管理</el-button
+          >返回课程列表</el-button
         >
-        <el-button @click="user" type="info" plain>个人信息</el-button>
-        <el-button @click="about" type="primary" plain>关于我们</el-button>
         <el-button
           @click="logout"
           style="margin-right: 10px; margin-bottom: 5px"
@@ -22,6 +18,7 @@
       </div>
     </div>
     <div style="display: flex">
+      <el-button style="margin-left:10px;margin-top:10px" type="primary" @click="handleGet">下载模版</el-button>
       <div style="width: 20px"></div>
       <el-upload
         :auto-upload="false"
@@ -29,7 +26,7 @@
         action="action"
         :on-change="handleChange"
       >
-        <el-button type="primary">导入 excel</el-button>
+        <el-button style="margin-top:10px" type="primary">导入 excel</el-button>
       </el-upload>
     </div>
     <br />
@@ -66,41 +63,21 @@ export default {
   },
   methods: {
     getUserId() {
+      console.log(this.$route.params);
       this.userId = this.$route.params.userId;
     },
-    logout(){
+    logout() {
       window.sessionStorage.clear();
       this.$router.push("/login");
     },
-    data() {
-      this.$router.push({
-        name: "Data",
-        params: { userId: this.userId },
-      });
-    },
-    home() {
-      this.$router.push({
-        name: "Home",
-        params: { userId: this.userId },
-      });
-    },
-    user() {
-      this.$router.push({
-        name: "User",
-        params: { userId: this.userId },
-      });
-    },
-    about() {
-      this.$router.push({
-        name: "About",
-        params: { userId: this.userId },
-      });
-    },
     classManage() {
-      window.location.reload();
+      this.$router.push({
+        name: "courseList",
+        params: { userId: this.userId },
+      });
     },
     handleGet() {
-      window.open("/cdn/demo.xlsx");
+      
     },
     handleChange(file, fileLis) {
       this.$Export.xlsx(file.raw).then((data) => {

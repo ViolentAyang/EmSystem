@@ -5,16 +5,9 @@
         工程认证达成度定型化管理系统
       </div>
       <div style="margin-top: 10px; float: right">
-        <el-button @click="home" type="danger" plain> 首页 </el-button>
-        <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
-          >班级管理</el-button
+          >专业达成度</el-button
         >
-        <el-button @click="teacherManager" type="primary" plain
-          >教师管理</el-button
-        >
-        <el-button @click="user" type="info" plain>个人信息</el-button>
-        <el-button @click="about" type="primary" plain>关于我们</el-button>
         <el-button
           @click="logout"
           style="margin-right: 10px; margin-bottom: 5px"
@@ -24,12 +17,12 @@
         >
       </div>
     </div>
-    <el-alert title="教师账号管理" type="success" :closable="false"> </el-alert>
+    <el-alert title="查看成绩录入情况" type="success" :closable="false"> </el-alert>
     <div style="float: left; display: flex">
       <el-input
         style="width: 180px; margin-left: 10px; margin-top: 10px"
-        v-model="InitSearch.teacherName"
-        placeholder="请输入教师名"
+        v-model="InitSearch.teacherNo"
+        placeholder="请输入教师号"
       ></el-input>
       <el-input
         style="
@@ -38,8 +31,8 @@
           margin-left: 10px;
           margin-right: 10px;
         "
-        v-model="InitSearch.teacherNo"
-        placeholder="请输入教师号"
+        v-model="InitSearch.courseNo"
+        placeholder="请输入课程号"
       ></el-input>
       <el-button
         style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
@@ -56,67 +49,8 @@
         >重置</el-button
       >
     </div>
-    <el-button
-      style="
-        margin-right: 30px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        float: right;
-      "
-      @click="addteacher"
-      type="success"
-      >新增教师账号</el-button
-    >
 
-    <!--新增培养计划对话框-->
-    <el-dialog
-      title="新增教师账号"
-      :visible.sync="dialogVisibleAdd"
-      width="40%"
-      :before-close="handleCloseAdd"
-    >
-      <el-form ref="form" :model="addTeacherForm" label-width="120px">
-        <el-form-item label="教师名">
-          <el-input v-model="addTeacherForm.teacherName"></el-input>
-        </el-form-item>
-        <el-form-item label="教师号(职工号)">
-          <el-input v-model="addTeacherForm.teacherNo"></el-input>
-        </el-form-item>
-        <el-form-item label="教师登录密码">
-          <el-input v-model="addTeacherForm.teacherPassword"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCloseAdd">取 消</el-button>
-        <el-button type="danger" @click="resetAddForm">重置</el-button>
-        <el-button type="primary" @click="submitAdd">提交</el-button>
-      </span>
-    </el-dialog>
 
-    <!--修改培养计划对话框-->
-    <el-dialog
-      title="新增教师账号"
-      :visible.sync="dialogVisibleEdit"
-      width="40%"
-      :before-close="handleCloseEdit"
-    >
-      <el-form ref="form" :model="editTeacherForm" label-width="120px">
-        <el-form-item label="教师名">
-          <el-input v-model="editTeacherForm.teacherName"></el-input>
-        </el-form-item>
-        <el-form-item label="教师号(职工号)">
-          <el-input v-model="editTeacherForm.teacherNo"></el-input>
-        </el-form-item>
-        <el-form-item label="教师登录密码">
-          <el-input v-model="editTeacherForm.teacherPassword"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCloseEdit">取 消</el-button>
-        <el-button type="danger" @click="resetEditForm">重置</el-button>
-        <el-button type="primary" @click="submitEdit">提交</el-button>
-      </span>
-    </el-dialog>
 
     <!--显示用户下所有的教师编号-->
     <el-table
@@ -125,32 +59,33 @@
       border
       style="width: 100%"
     >
-      <el-table-column header-align="center" prop="teacherNo" label="教师号">
-      </el-table-column>
-      <el-table-column header-align="center" prop="teacherName" label="教师名">
+      <el-table-column
+        header-align="center"
+        prop="teacherName"
+        label="教师名"
+      >
       </el-table-column>
       <el-table-column
         header-align="center"
-        prop="teacherPassword"
-        label="教师密码"
+        prop="courseName"
+        label="课程名"
       >
       </el-table-column>
-      <el-table-column header-align="center" label="账号状态">
+      <el-table-column header-align="center" label="成绩录入情况">
         <template v-slot="scope">
           <el-switch
-            @change="userStateChanged(scope.row)"
             v-model="scope.row.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            disabled
           >
           </el-switch>
         </template>
       </el-table-column>
       <el-table-column header-align="center" label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="EditTeacher(scope.row)"
-            >修改</el-button
-          >
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
-            >删除</el-button
+          <el-button size="mini" type="primary" @click="uploadScore(scope.row)"
+            >录入成绩</el-button
           >
         </template>
       </el-table-column>
@@ -162,7 +97,19 @@
 export default {
   data() {
     return {
-      
+      InitSearch:{
+        teacherNo:"",
+        courseNo:""
+      },
+      Alldata:[
+        {
+        teacherName:"刘子扬",
+        courseName:"大数据开发",
+        courseNo:"01",
+        status:true,
+        }
+      ],
+
     };
   },
   created() {
@@ -179,44 +126,19 @@ export default {
       window.sessionStorage.clear();
       this.$router.push("/login");
     },
-    teacherManager() {
-      this.$router.push({
-        name: "teacherManager",
-        params: { userId: this.userId },
-      });
-    },
-    data() {
-      this.$router.push({
-        name: "Data",
-        params: { userId: this.userId },
-      });
-    },
-    home() {
-      this.$router.push({
-        name: "Home",
-        params: { userId: this.userId },
-      });
-    },
-    user() {
-      this.$router.push({
-        name: "User",
-        params: { userId: this.userId },
-      });
-    },
-    about() {
-      this.$router.push({
-        name: "About",
-        params: { userId: this.userId },
-      });
-    },
     classManage() {
-      this.$router.push({
-        name: "Class",
-        params: { userId: this.userId },
-      });
+      window.location.reload()
     },
- 
-
+    //进入录入成绩
+    uploadScore(row){
+      this.$router.push({
+        name: "uploadScore",
+        params: {
+           userId: this.userId,
+           courseNo: row.courseNo
+         },
+      });
+    }
   },
 };
 </script>

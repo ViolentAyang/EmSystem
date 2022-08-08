@@ -93,6 +93,10 @@ export default {
         username: "",
         password: "",
       },
+      teacherform: {
+        teacherNo: "",
+        teacherPassword: "",
+      },
       ruleFormReg: {
         name: "",
         pass: "",
@@ -147,11 +151,13 @@ export default {
       });
     },
     async teacherLogin() {
-      /*const { data: res } = await this.$http.post("login", this.form);
+      this.teacherform.teacherNo = this.form.username;
+      this.teacherform.teacherPassword = this.form.password;
+      const { data: res } = await this.$http.post("teacherLogin", this.teacherform);
       if (res.meta.status != "200") return this.$message.error("登录失败！");
       this.$message.success("登录成功！");
       this.userId = res.data.userId;
-      window.sessionStorage.setItem("token", res.data.token);*/
+      window.sessionStorage.setItem("token", res.data.token);
       this.$router.push({
         name: "courseList",
         params: { userId: this.userId },

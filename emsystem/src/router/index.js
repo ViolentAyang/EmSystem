@@ -14,6 +14,7 @@ import supportEstate from '../views/DataManage/supportEstate.vue'
 import uploadScore from '../views/teacher/uploadScore.vue'
 import teacherManager from '../views/teacherManager/teacherManager.vue'
 import courseList from '../views/teacher/courseList.vue'
+import assignCourse from '../views/teacherManager/assignCourse.vue'
 
 
 Vue.use(VueRouter)
@@ -97,6 +98,11 @@ const routes = [
     path: '/courseList/:userId',
     name: 'courseList',
     component: courseList
+  },
+  {
+    path: '/assignCourse/:userId',
+    name: 'assignCourse',
+    component: assignCourse
   },
 ]
 

@@ -8,7 +8,7 @@
         <el-button @click="home" type="danger" plain> 首页 </el-button>
         <el-button @click="data" type="primary" plain>数据管理</el-button>
         <el-button @click="classManage" type="success" plain
-          >班级管理</el-button
+          >专业达成度</el-button
         >
         <el-button @click="teacherManager" type="primary" plain>教师管理</el-button>
         <el-button @click="user" type="info" plain>个人信息</el-button>
@@ -43,11 +43,6 @@
         style="width: 180px; margin-right: 10px; margin-top: 10px"
         v-model="InitSearch.courseName"
         placeholder="请输入课程名"
-      ></el-input>
-      <el-input
-        style="width: 180px; margin-top: 10px; margin-right: 10px"
-        v-model="InitSearch.arrangeTerm"
-        placeholder="请输入开设学期"
       ></el-input>
       <el-button
         style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
@@ -92,9 +87,6 @@
       <el-form-item label="课时数">
         <el-input v-model="addForm.creditHour"></el-input>
       </el-form-item>
-      <el-form-item label="开设学期">
-        <el-input v-model="addForm.arrangeTerm"></el-input>
-      </el-form-item>
     </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCloseAdd">取 消</el-button>
@@ -123,9 +115,6 @@
       <el-form-item label="课时数">
         <el-input v-model="editForm.creditHour"></el-input>
       </el-form-item>
-      <el-form-item label="开设学期">
-        <el-input v-model="editForm.arrangeTerm"></el-input>
-      </el-form-item>
     </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCloseEdit">取 消</el-button>
@@ -150,12 +139,7 @@
       </el-table-column>
       <el-table-column header-align="center" prop="creditHour" label="学时">
       </el-table-column
-      ><el-table-column
-        header-align="center"
-        prop="arrangeTerm"
-        label="开设学期"
       >
-      </el-table-column>
       <el-table-column header-align="center" label="操作">
         <template slot-scope="scope">
           <el-button size="mini" type="danger" @click="handleDelete(scope.row)"
