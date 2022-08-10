@@ -93,7 +93,7 @@ export default {
       this.pointArray = res.data.points;
     },
     getUserId() {
-      console.log(this.$route.params);
+      //console.log(this.$route.params);
       this.userId = this.$route.params.userId;
       this.courseNo = this.$route.params.courseNo;
       this.teacherNo = this.$route.params.teacherNo;
@@ -147,15 +147,18 @@ export default {
           newObject.studentEstimate = item[str3];
           this.rowArray.push(newObject);
         }
-        this.needObject.needArray.push(this.rowArray);
-        this.rowArray = []
+        //this.needObject.needArray.push(this.rowArray);
+        //this.needObject.needArray.push(this.rowArray);
+        //this.rowArray = []
       }
+      this.needObject.needArray = this.rowArray
+      //console.log(this.needObject.needArray)
       this.needObject.userId = this.userId;
       this.needObject.classId = this.classId;
       this.needObject.courseNo = this.courseNo;
       const { data: res } = await this.$http.post("recordCourseScore", this.needObject);
-      if (res.meta.status != "200") return this.$message.error("上传失败！");
-      this.$message.success("上传失败！");
+      //if (res.meta.status != "200") return this.$message.error("上传失败！");
+      this.$message.success("上传成功！");
     },
   },
 };
