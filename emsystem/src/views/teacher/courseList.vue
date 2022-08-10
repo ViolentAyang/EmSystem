@@ -147,6 +147,8 @@ export default {
         params: {
           userId: this.userId,
           courseNo: row.courseNo,
+          teacherNo: this.teacherNo,
+          classId:row.classId
         },
       });
     },

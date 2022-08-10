@@ -39,7 +39,7 @@
         @click="handleUpload"
         style="margin-top: 10px; margin-left: 10px"
         type="primary"
-        >查看结果</el-button
+        >上传成绩</el-button
       >
     </div>
     <br />
@@ -51,6 +51,7 @@
 export default {
   data() {
     return {
+      teacherNo:"",
       userId: "",
       list: [],
       courseNo: "",
@@ -62,6 +63,7 @@ export default {
       },
       //需要传给后端的数据
       needObject: {
+        classId: "",
         userId: "",
         courseNo: "",
         needArray: [],
@@ -72,6 +74,7 @@ export default {
       pointArray: [],
       //用于存放每一行的指标点数组
       rowArray : [],
+      classId:"",
     };
   },
   created() {
@@ -93,6 +96,8 @@ export default {
       console.log(this.$route.params);
       this.userId = this.$route.params.userId;
       this.courseNo = this.$route.params.courseNo;
+      this.teacherNo = this.$route.params.teacherNo;
+      this.classId = this.$route.params.classId;
     },
     logout() {
       window.sessionStorage.clear();
@@ -101,7 +106,9 @@ export default {
     classManage() {
       this.$router.push({
         name: "courseList",
-        params: { userId: this.userId },
+        params:{ 
+          userId: this.userId,
+          teacherNo:this.teacherNo },
       });
     },
     handleGet() {
@@ -120,12 +127,10 @@ export default {
     handleChange(file, fileLis) {
       this.$Export.xlsx(file.raw).then((data) => {
         this.list = data.results;
-        console.log(this.list);
-        //console.log(this.list[3])
-        //console.log(this.list[3].学号)
+        //console.log(this.list);
       });
     },
-    handleUpload() {
+    async handleUpload() {
       for (var item of this.list) {
         for (var arr of this.pointArray) {
           const str1 = "指标点Id(" + arr.tpId + ")";
@@ -141,13 +146,16 @@ export default {
           newObject.teacherEstimate = item[str2];
           newObject.studentEstimate = item[str3];
           this.rowArray.push(newObject);
-          console.log("测试每一行的对象数组")
-          console.log(this.rowArray)
         }
         this.needObject.needArray.push(this.rowArray);
         this.rowArray = []
       }
-      console.log(this.needObject);
+      this.needObject.userId = this.userId;
+      this.needObject.classId = this.classId;
+      this.needObject.courseNo = this.courseNo;
+      const { data: res } = await this.$http.post("recordCourseScore", this.needObject);
+      if (res.meta.status != "200") return this.$message.error("上传失败！");
+      this.$message.success("上传失败！");
     },
   },
 };
