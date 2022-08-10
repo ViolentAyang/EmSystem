@@ -155,12 +155,14 @@ export default {
       this.teacherform.teacherPassword = this.form.password;
       const { data: res } = await this.$http.post("teacherLogin", this.teacherform);
       if (res.meta.status != "200") return this.$message.error("登录失败！");
-      this.$message.success("登录成功！");
+      const msg = res.meta.msg
+      this.$message.success(msg);
       this.userId = res.data.userId;
       window.sessionStorage.setItem("token", res.data.token);
       this.$router.push({
         name: "courseList",
-        params: { userId: this.userId },
+        params: { userId: this.userId,
+        teacherNo:this.teacherform.teacherNo },
       });
     },
     remenber(data) {

@@ -17,12 +17,17 @@
         >
       </div>
     </div>
-    <el-alert title="查看成绩录入情况" type="success" :closable="false"> </el-alert>
+    <el-alert title="查看成绩录入情况" type="success" :closable="false">
+    </el-alert>
     <div style="float: left; display: flex">
       <el-input
-        style="width: 180px; margin-left: 10px; margin-top: 10px"
-        v-model="InitSearch.teacherNo"
-        placeholder="请输入教师号"
+        style="
+          width: 180px;
+          margin-top: 10px;
+          margin-left: 10px;
+        "
+        v-model="InitSearch.courseName"
+        placeholder="请输入课程名"
       ></el-input>
       <el-input
         style="
@@ -31,8 +36,8 @@
           margin-left: 10px;
           margin-right: 10px;
         "
-        v-model="InitSearch.courseNo"
-        placeholder="请输入课程号"
+        v-model="InitSearch.arrangeNum"
+        placeholder="请输入开设学期"
       ></el-input>
       <el-button
         style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
@@ -50,26 +55,18 @@
       >
     </div>
 
-
-
     <!--显示用户下所有的教师编号-->
     <el-table
       :cell-style="{ textAlign: 'center' }"
       :data="Alldata"
       border
       style="width: 100%"
-    >
-      <el-table-column
-        header-align="center"
-        prop="teacherName"
-        label="教师名"
-      >
+    > 
+      <el-table-column header-align="center" prop="courseName" label="课程名">
       </el-table-column>
-      <el-table-column
-        header-align="center"
-        prop="courseName"
-        label="课程名"
-      >
+      <el-table-column header-align="center" prop="teacherClass" label="教授班级">
+      </el-table-column>
+      <el-table-column header-align="center" prop="arrangeNum" label="开设学期">
       </el-table-column>
       <el-table-column header-align="center" label="成绩录入情况">
         <template v-slot="scope">
@@ -97,29 +94,43 @@
 export default {
   data() {
     return {
-      InitSearch:{
-        teacherNo:"",
-        courseNo:""
+      InitSearch: {
+        userId: "",
+        teacherNo: "",
+        courseName: "",
+        arrangeNum:""
       },
-      Alldata:[
-        {
-        teacherName:"刘子扬",
-        courseName:"大数据开发",
-        courseNo:"01",
-        status:true,
-        }
-      ],
-
+      teacherSearch: {
+        userId: "",
+        teacherName: "",
+      },
+      Alldata: [],
+      userId: "",
+      teacherNo:"",
     };
   },
   created() {
     this.getUserId();
+    this.getList();
   },
   methods: {
-
+    async getList() {
+      const { data: res } = await this.$http.post(
+        "getTeacherScoreRecorded",
+        this.InitSearch
+      );
+      if (res.meta.status != "200") return this.$message.error("获取失败！");
+      this.$message.success("获取成功！");
+      this.Alldata = res.data
+    },
     getUserId() {
+      console.log(this.$route.params);
       this.userId = this.$route.params.userId;
+      this.teacherNo = this.$route.params.teacherNo;
+      this.InitSearch.teacherNo = this.teacherNo;
       this.InitSearch.userId = this.userId;
+      console.log(this.InitSearch)
+      this.teacherSearch.userId = this.userId;
       //console.log(this.InitSearch)
     },
     logout() {
@@ -127,18 +138,23 @@ export default {
       this.$router.push("/login");
     },
     classManage() {
-      window.location.reload()
+      window.location.reload();
     },
     //进入录入成绩
-    uploadScore(row){
+    uploadScore(row) {
       this.$router.push({
         name: "uploadScore",
         params: {
-           userId: this.userId,
-           courseNo: row.courseNo
-         },
+          userId: this.userId,
+          courseNo: row.courseNo,
+        },
       });
-    }
+    },
+    tableFilter() {},
+    filterReset() {
+      this.InitSearch.courseName = ""
+      this.InitSearch.arrangeNum = ""
+    },
   },
 };
 </script>

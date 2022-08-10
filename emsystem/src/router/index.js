@@ -85,7 +85,7 @@ const routes = [
     component: supportEstate
   },
   {
-    path: '/uploadScore/:userId',
+    path: '/uploadScore/:userId/:courseNo',
     name: 'uploadScore',
     component: uploadScore
   },
@@ -95,7 +95,7 @@ const routes = [
     component: teacherManager
   },
   {
-    path: '/courseList/:userId',
+    path: '/courseList/:userId/:teacherNo',
     name: 'courseList',
     component: courseList
   },
