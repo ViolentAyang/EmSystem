@@ -15,6 +15,8 @@ import uploadScore from '../views/teacher/uploadScore.vue'
 import teacherManager from '../views/teacherManager/teacherManager.vue'
 import courseList from '../views/teacher/courseList.vue'
 import assignCourse from '../views/teacherManager/assignCourse.vue'
+import checkResultMajor from '../views/checkResults/checkResultMajor.vue'
+import checkResultClass from '../views/checkResults/checkResultClass.vue'
 
 
 Vue.use(VueRouter)
@@ -103,6 +105,16 @@ const routes = [
     path: '/assignCourse/:userId',
     name: 'assignCourse',
     component: assignCourse
+  },
+  {
+    path: '/checkResultMajor/:userId',
+    name: 'checkResultMajor',
+    component: checkResultMajor
+  },
+  {
+    path: '/checkResultClass/:userId',
+    name: 'checkResultClass',
+    component: checkResultClass
   },
 ]
 

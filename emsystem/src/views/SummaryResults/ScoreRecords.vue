@@ -65,6 +65,22 @@
         icon="el-icon-refresh"
         >重置</el-button
       >
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="viewGrade"
+        type="primary"
+        plain
+        icon="el-icon-user-solid"
+        >查看年级达成度结果</el-button
+      >
+      <el-button
+        style="margin-right: 10px; margin-top: 10px; margin-bottom: 10px"
+        @click="viewClass"
+        type="primary"
+        plain
+        icon="el-icon-user"
+        >查看班级达成度结果</el-button
+      >
     </div>
 
     <!--显示用户下所有的教师教授信息-->
@@ -179,6 +195,18 @@ export default {
     classManage() {
       window.location.reload()
     },
+    viewGrade(){
+      this.$router.push({
+        name: "checkResultMajor",
+        params: { userId: this.userId },
+      });
+    },
+    viewClass(){
+      this.$router.push({
+        name: "checkResultClass",
+        params: { userId: this.userId },
+      });
+    }
   },
 };
 </script>
