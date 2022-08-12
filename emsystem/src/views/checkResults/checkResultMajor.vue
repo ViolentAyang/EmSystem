@@ -66,7 +66,7 @@ export default {
         userId:""
       },
       options:[],
-      value:'',
+      value:"",
       searchResult:{
         userId:"",
         majorId:""
@@ -134,8 +134,9 @@ export default {
     },
     async handleChange(value){
       this.searchResult.userId = this.userId;
-      this.searchResult.majorId = value[2];
-      //console.log(value[2]);
+      this.searchResult.majorId = value[1];
+      console.log(value);
+      console.log(this.searchResult)
       const { data: res } = await this.$http.post(
         "viewMajorAchievement",
         this.searchResult
