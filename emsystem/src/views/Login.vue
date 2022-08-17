@@ -209,7 +209,7 @@ export default {
   width: 100%;
   height: 100%;
   min-width: 1000px;
-  background-image: url("../assets/login2.jpg");
+  background-image: url("../assets/login2.png");
   background-size: 100% 100%;
   background-position: center center;
   overflow: auto;

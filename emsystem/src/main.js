@@ -13,9 +13,9 @@ import '@smallwei/avue/lib/index.css';
 import axios from 'axios'
 
 Vue.prototype.$http = axios
-//请求根路径
-axios.defaults.baseURL = 'http://127.0.0.1:8888/'
-
+//请求根路径http://47.97.175.79:8889
+//axios.defaults.baseURL = 'http://127.0.0.1:8888/'
+axios.defaults.baseURL = 'http://47.97.175.79:8889/'
 
 
 

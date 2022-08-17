@@ -93,6 +93,7 @@ export default {
       console.log("测试xlx")
       console.log(this.option)
       this.pointArray = res.data.points;
+      this.getUserId();
     },
     getUserId() {
       //console.log(this.$route.params);
@@ -109,8 +110,8 @@ export default {
       this.$router.push({
         name: "courseList",
         params:{ 
-          userId: this.userId,
-          teacherNo:this.teacherNo },
+          userId: this.$route.params.userId,
+          teacherNo:this.$route.params.teacherNo},
       });
     },
     handleGet() {
@@ -133,7 +134,7 @@ export default {
         console.log(this.list);
       });
     },
-    handleUpload() {
+    async handleUpload() {
       for (var item of this.list) {
         for (var arr of this.pointArray) {
           const str1 = "指标点Id(" + arr.tpId + ")";
@@ -159,10 +160,11 @@ export default {
       this.needObject.userId = this.userId;
       this.needObject.classId = this.classId;
       this.needObject.courseNo = this.courseNo;
-      this.$http.post("recordCourseScore", this.needObject);
+      const { data: res } = await this.$http.post("recordCourseScore", this.needObject);
       //if (res.meta.status != "200") return this.$message.error("上传失败！");
-      this.$message.success("上传成功！");
+      this.$message.success(res.meta.msg);
       window.location.reload();
+      this.getUserId()
     },
   },
 };
