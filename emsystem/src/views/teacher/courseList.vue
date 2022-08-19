@@ -2,7 +2,7 @@
   <div>
     <div id="guide">
       <div style="margin-top: 10px; margin-left: 20px; float: left">
-        工程认证达成度定型化管理系统
+        工程认证达成度定性化管理系统
       </div>
       <div style="margin-top: 10px; float: right">
         <el-button @click="classManage" type="success" plain
